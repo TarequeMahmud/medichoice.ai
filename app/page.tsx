@@ -1,11 +1,40 @@
+import PatientForm from "@/components/forms/PatientForm";
+import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div>
-      <h1 className="text-white text-3xl underline">home</h1>
-      <Button>This is button</Button>
+    <div className="flex h-screen max-h-screen">
+      {/* TODO: OTP Verification | PasskeyModal */}
+      <section className="remove-scrollbar container my-auto">
+        <div className="sub-container max-w-[500px] ">
+          <div className="flex w-full p-2 items-center mb-4 border-2 rounded-md border-zinc-200">
+            <Image
+              src="./assets/icons/logo-full.svg"
+              alt="Logo"
+              width={100}
+              height={100}
+            />
+            <p className="font-bold text-6xl">CLINICLINK</p>
+          </div>
+          <PatientForm />
+          <div className="text-14-regular mt-20 flex justify-between">
+            <p className="justify-items-end text-dark-600 xl:text-left">
+              © 2024 ClinicLink
+            </p>
+            <Link href="/?admin=true" className="text-green-500">
+              Admin
+            </Link>
+          </div>
+        </div>
+      </section>
+      <Image
+        src="/assets/images/healthcare.jpg"
+        height={1000}
+        width={1000}
+        alt="healthcare"
+        className="side-img max-w-[50%]"
+      />
     </div>
   );
 }
