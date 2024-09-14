@@ -8,7 +8,7 @@ export default function Home() {
       {/* TODO: OTP Verification | PasskeyModal */}
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[500px] ">
-          <div className="flex w-full p-2 items-center mb-4 border-2 rounded-md border-zinc-200">
+          <div className="flex w-full p-2 items-center mb-2 border-2 rounded-md border-zinc-200">
             <Image
               src="./assets/icons/logo-full.svg"
               alt="Logo"
@@ -17,7 +17,10 @@ export default function Home() {
             />
             <p className="font-bold text-6xl">CLINICLINK</p>
           </div>
-          <PatientForm />
+          <div className="">
+            <PatientForm />
+          </div>
+
           <div className="text-14-regular mt-20 flex justify-between">
             <p className="justify-items-end text-dark-600 xl:text-left">
               © 2024 ClinicLink
@@ -33,7 +36,7 @@ export default function Home() {
         height={1000}
         width={1000}
         alt="healthcare"
-        className="side-img max-w-[50%]"
+        className="side-img max-w-[50%] h-100"
       />
     </div>
   );
