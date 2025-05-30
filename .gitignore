@@ -8,6 +8,10 @@ node_modules
 *.pid.lock
 
 # --- Build output ---
+/backend/build
+/backend/dist
+/frontend/build
+/frontend/dist
 /build
 /dist
 /.next
