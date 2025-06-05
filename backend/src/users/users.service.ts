@@ -11,8 +11,20 @@ export class UsersService {
     private userRepository: Repository<Users>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto): Promise<Users> {
+    try {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: createUserDto.email },
+      });
+      if (existingUser) {
+        throw new Error('User with this email already exists');
+      }
+
+      const newUser = this.userRepository.create(createUserDto);
+      return await this.userRepository.save(newUser);
+    } catch (error) {
+      throw error;
+    }
   }
 
   findAll() {
@@ -24,7 +36,7 @@ export class UsersService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return updateUserDto;
   }
 
   remove(id: number) {
