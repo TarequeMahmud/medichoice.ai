@@ -2,7 +2,7 @@
   "name": "medichoice.ai-backend",
   "version": "1.0.0",
   "description": "Server for medichoise.ai platform",
-  "author": "",
+  "author": "Tareque Mahmud",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -27,6 +27,8 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/typeorm": "^11.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "pg": "^8.16.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
