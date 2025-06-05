@@ -14,6 +14,10 @@ async function bootstrap() {
       'This is the api documentation of all routes of Medichoice.AI api. Use these carefully',
     )
     .setVersion('1.0')
+    .addGlobalResponse({
+      status: 500,
+      description: 'Internal server error',
+    })
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

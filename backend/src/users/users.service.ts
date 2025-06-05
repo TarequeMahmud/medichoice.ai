@@ -21,7 +21,8 @@ export class UsersService {
       }
 
       const newUser = this.userRepository.create(createUserDto);
-      return await this.userRepository.save(newUser);
+      await this.userRepository.save(newUser);
+      return newUser;
     } catch (error) {
       throw error;
     }
