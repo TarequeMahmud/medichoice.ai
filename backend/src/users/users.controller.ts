@@ -11,6 +11,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Users } from './entities/user.entity';
+import { ApiValidationError } from 'src/common/decorators/swagger/bad-request.decorators';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
@@ -22,6 +23,7 @@ export class UsersController {
     description: 'The record has been successfully created.',
     type: Users,
   })
+  @ApiValidationError()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
