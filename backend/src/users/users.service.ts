@@ -68,7 +68,13 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: UUID): Promise<void> {
+    try {
+      await this.findOne(id);
+      await this.userRepository.delete(id);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }

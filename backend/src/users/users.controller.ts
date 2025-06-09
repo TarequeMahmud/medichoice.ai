@@ -102,7 +102,23 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiOkResponse({
+    description: 'Successfully deleted the user',
+  })
+  @ApiNotFoundResponse({
+    description: 'No user found in this id.',
+    content: {
+      'application/json': {
+        example: {
+          message: 'No user found in this id.',
+          error: 'Not Found',
+          statusCode: 404,
+        },
+      },
+    },
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'User UUID' })
+  remove(@Param('id') id: UUID) {
+    return this.usersService.remove(id);
   }
 }
