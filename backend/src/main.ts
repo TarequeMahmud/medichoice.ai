@@ -17,6 +17,14 @@ async function bootstrap() {
     .addGlobalResponse({
       status: 500,
       description: 'Internal server error',
+      content: {
+        'application/json': {
+          example: {
+            statusCode: 500,
+            message: 'Internal server error',
+          },
+        },
+      },
     })
     .build();
 

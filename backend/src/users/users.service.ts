@@ -1,8 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { Users } from './entities/user.entity';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -28,12 +29,28 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll(): Promise<Users[]> {
+    try {
+      const users = await this.userRepository.find();
+      return users;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: UUID): Promise<Users> {
+    try {
+      const user = await this.userRepository.findOne({ where: { id } });
+
+      if (!user) {
+        throw new NotFoundException('No user found in this id.');
+      }
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
