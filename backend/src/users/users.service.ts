@@ -53,8 +53,19 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return updateUserDto;
+  async update(id: UUID, updateUserDto: UpdateUserDto): Promise<Users> {
+    try {
+      const user = await this.findOne(id);
+      for (let key in updateUserDto) {
+        user[key] = updateUserDto[key];
+      }
+      const updatedUser = await this.userRepository.save(user);
+
+      return updatedUser;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   remove(id: number) {

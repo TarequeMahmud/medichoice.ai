@@ -10,6 +10,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -45,7 +46,7 @@ export class UsersController {
 
   @Get(':id')
   @ApiOkResponse({
-    description: 'Successfully returns with the expected user',
+    description: 'Successfully returns the expected user',
     type: Users,
   })
   @ApiNotFoundResponse({
@@ -66,8 +67,38 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiBody({
+    description: 'Fields to update for the user',
+    type: UpdateUserDto,
+    examples: {
+      emailUpdate: {
+        summary: 'Update user email only',
+        value: {
+          email: 'updated.email@example.com',
+        },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'No user found in this id.',
+    content: {
+      'application/json': {
+        example: {
+          message: 'No user found in this id.',
+          error: 'Not Found',
+          statusCode: 404,
+        },
+      },
+    },
+  })
+  @ApiOkResponse({
+    description: 'Successfully returns the updated user',
+    type: Users,
+  })
+  @ApiValidationError()
+  @ApiParam({ name: 'id', type: 'string', description: 'User UUID' })
+  update(@Param('id') id: UUID, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
