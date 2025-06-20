@@ -6,17 +6,24 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(private userService: UsersService) {}
-  async login(loginDto: LoginDto): Promise<Users> {
-    try {
-      const { email, password } = loginDto;
-      const user = await this.userService.findByEmail(email);
-      if (user.password === password) {
-        return user;
-      }
-      return user;
-    } catch (error) {
-      console.log(error);
-      throw error;
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ message: string; user: Partial<Users> }> {
+    const { email, password } = loginDto;
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new Error('User not found');
     }
+    if (user.password !== password) {
+      throw new Error('Invalid credentials');
+    }
+    return {
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+      },
+    };
   }
 }
