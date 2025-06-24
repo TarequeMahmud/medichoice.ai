@@ -1,8 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AiDto } from './dto/ai.dto';
 import { AiService } from './ai.service';
-import { ApiOkResponse } from '@nestjs/swagger';
-
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('ai')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
