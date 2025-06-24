@@ -14,6 +14,17 @@ async function bootstrap() {
       'This is the api documentation of all routes of Medichoice.AI api. Use these carefully',
     )
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'access-token',
+    )
     .addGlobalResponse({
       status: 500,
       description: 'Internal server error',
