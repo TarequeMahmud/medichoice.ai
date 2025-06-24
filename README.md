@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Medichoice AI
 
-## Getting Started
+Medichoice AI is an intelligent healthcare assistant designed to help users make informed medical decisions. Leveraging advanced AI algorithms, it provides personalized recommendations, symptom analysis, and reliable health information to support both patients and healthcare professionals.
 
-First, run the development server:
+## 🗃️ Database Schema for MediChoice AI
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The **MediChoice AI** application utilizes a well-structured relational database to manage patients, doctors, appointments, health records, and more.
+
+![MediChoice AI Logo](assets/images/db.png)
+
+---
+
+### 🧱 Tables Overview
+
+#### 1. `users`
+
+```sql
+id UUID PRIMARY KEY,
+name VARCHAR,
+email VARCHAR UNIQUE,
+password_hash TEXT,
+role ENUM('patient', 'doctor', 'admin'),
+created_at TIMESTAMP,
+updated_at TIMESTAMP
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### 2. `doctors`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sql
+id UUID PRIMARY KEY,
+user_id UUID REFERENCES users(id),
+specialization VARCHAR,
+bio TEXT,
+availability_schedule JSON
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### 3. `patients`
 
-## Learn More
+```sql
+id UUID PRIMARY KEY,
+user_id UUID REFERENCES users(id),
+date_of_birth DATE,
+gender VARCHAR,
+blood_type VARCHAR
+```
 
-To learn more about Next.js, take a look at the following resources:
+#### 4. `appointments`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sql
+id UUID PRIMARY KEY,
+doctor_id UUID REFERENCES doctors(id),
+patient_id UUID REFERENCES patients(id),
+appointment_time TIMESTAMP,
+status ENUM('scheduled', 'completed', 'cancelled'),
+notes TEXT
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### 5. `medical_records`
 
-## Deploy on Vercel
+```sql
+id UUID PRIMARY KEY,
+patient_id UUID REFERENCES patients(id),
+doctor_id UUID REFERENCES doctors(id),
+visit_date TIMESTAMP,
+diagnosis TEXT,
+prescriptions JSON,
+attachments TEXT -- file URL or path
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### 6. `messages`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```sql
+id UUID PRIMARY KEY,
+sender_id UUID REFERENCES users(id),
+receiver_id UUID REFERENCES users(id),
+content TEXT,
+timestamp TIMESTAMP
+```
+
+---
+
+### 📝 Notes
+
+- All timestamps default to `NOW()` on creation.
+- Proper indexing is applied on foreign keys and searchable fields.
+- Sensitive data (e.g., password hashes) is securely stored using encryption and hashing mechanisms.
