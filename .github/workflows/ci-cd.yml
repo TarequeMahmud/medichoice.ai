@@ -24,13 +24,16 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
+        working-directory: ./backend
 
       - name: Lint
         run: npm run lint
+        working-directory: ./backend
 
-      - name: Build Nestjs backend api
+      - name: Build NestJS backend API
         run: npm run build
+        working-directory: ./backend
   deploy:
     needs: build
     runs-on: ubuntu-latest
