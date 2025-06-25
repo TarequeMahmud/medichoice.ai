@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 import { UserRole } from '../entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseAuthDto } from 'src/users/dto/base-auth.dto';
