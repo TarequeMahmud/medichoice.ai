@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { Users } from './entities/user.entity';
 import { UUID } from 'crypto';
+import { rethrowIfError } from 'src/common/utils/rethrowIfError';
 
 @Injectable()
 export class UsersService {
@@ -13,29 +14,23 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    try {
-      const existingUser = await this.userRepository.findOne({
-        where: { email: createUserDto.email },
-      });
-      if (existingUser) {
-        throw new Error('User with this email already exists');
-      }
-
-      const newUser = this.userRepository.create(createUserDto);
-      await this.userRepository.save(newUser);
-      return newUser;
-    } catch (error) {
-      throw error;
+    const existingUser = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+    if (existingUser) {
+      throw new Error('User with this email already exists');
     }
+    const newUser = this.userRepository.create(createUserDto);
+    await this.userRepository.save(newUser);
+    return newUser;
   }
 
   async findAll(): Promise<Users[]> {
     try {
       const users = await this.userRepository.find();
       return users;
-    } catch (error) {
-      console.log(error);
-      throw error;
+    } catch (error: unknown) {
+      rethrowIfError(error);
     }
   }
 
@@ -47,9 +42,8 @@ export class UsersService {
         throw new NotFoundException('No user found in this id.');
       }
       return user;
-    } catch (error) {
-      console.log(error);
-      throw error;
+    } catch (error: unknown) {
+      rethrowIfError(error);
     }
   }
 
@@ -65,15 +59,12 @@ export class UsersService {
   async update(id: UUID, updateUserDto: UpdateUserDto): Promise<Users> {
     try {
       const user = await this.findOne(id);
-      for (let key in updateUserDto) {
-        user[key] = updateUserDto[key];
-      }
+      Object.assign(user, updateUserDto);
       const updatedUser = await this.userRepository.save(user);
 
       return updatedUser;
-    } catch (error) {
-      console.log(error);
-      throw error;
+    } catch (error: unknown) {
+      rethrowIfError(error);
     }
   }
 
@@ -81,9 +72,8 @@ export class UsersService {
     try {
       await this.findOne(id);
       await this.userRepository.delete(id);
-    } catch (error) {
-      console.log(error);
-      throw error;
+    } catch (error: unknown) {
+      rethrowIfError(error);
     }
   }
 }
