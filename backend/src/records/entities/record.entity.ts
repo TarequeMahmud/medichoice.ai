@@ -70,3 +70,5 @@ export class Records {
   @ApiProperty({ description: 'Updated at timestamp' })
   updated_at: Date;
 }
+
+export class Record {}
