@@ -7,6 +7,7 @@ import { PatientsModule } from './patients/patients.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { DoctorsModule } from './doctors/doctors.module';
 import { RecordsModule } from './records/records.module';
+import { MessagesModule } from './messages/messages.module';
 
 
 @Module({
@@ -19,6 +20,7 @@ import { RecordsModule } from './records/records.module';
     AppointmentsModule,
     DoctorsModule,
     RecordsModule,
+    MessagesModule,
 
   ],
 })
