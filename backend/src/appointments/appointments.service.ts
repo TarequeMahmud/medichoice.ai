@@ -5,7 +5,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 @Injectable()
 export class AppointmentsService {
   create(createAppointmentDto: CreateAppointmentDto) {
-    return 'This action adds a new appointment';
+    return createAppointmentDto;
   }
 
   findAll() {
@@ -17,7 +17,7 @@ export class AppointmentsService {
   }
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    return `This action updates a #${id} appointment`;
+    return updateAppointmentDto;
   }
 
   remove(id: number) {
