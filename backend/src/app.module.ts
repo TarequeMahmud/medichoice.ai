@@ -6,6 +6,7 @@ import { AiModule } from './ai/ai.module';
 import { PatientsModule } from './patients/patients.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { DoctorsModule } from './doctors/doctors.module';
+import { RecordsModule } from './records/records.module';
 
 
 @Module({
@@ -17,6 +18,7 @@ import { DoctorsModule } from './doctors/doctors.module';
     PatientsModule,
     AppointmentsModule,
     DoctorsModule,
+    RecordsModule,
 
   ],
 })
