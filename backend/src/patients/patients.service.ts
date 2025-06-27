@@ -1,18 +1,41 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { Repository } from 'typeorm';
 import { Patients } from './entities/patient.entity';
 import { UUID } from 'crypto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class PatientsService {
   constructor(
     @Inject('PATIENT_REPOSITORY')
     private patientRepository: Repository<Patients>,
+    private userService: UsersService,
   ) {}
-  async create(createPatientDto: CreatePatientDto): Promise<Patients> {
-    const newPatientProfile = this.patientRepository.create(createPatientDto);
+  async create(
+    userId: UUID,
+    createPatientDto: CreatePatientDto,
+  ): Promise<Patients> {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isExists = await this.findOne(userId);
+    if (isExists) {
+      throw new ConflictException('Patient profile already exists');
+    }
+
+    const newPatientProfile = this.patientRepository.create({
+      ...createPatientDto,
+      id: userId,
+    });
     await this.patientRepository.save(newPatientProfile);
     return newPatientProfile;
   }
