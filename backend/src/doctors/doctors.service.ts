@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
+import { Repository } from 'typeorm';
+import { Doctors } from './entities/doctor.entity';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class DoctorsService {
-  create(createDoctorDto: CreateDoctorDto) {
-    return createDoctorDto;
+  constructor(private doctorRepository: Repository<Doctors>) {}
+
+  async create(createDoctorDto: CreateDoctorDto): Promise<Doctors> {
+    const doctor = this.doctorRepository.create(createDoctorDto);
+    return await this.doctorRepository.save(doctor);
   }
 
-  findAll() {
-    return `This action returns all doctors`;
+  async findAll(): Promise<Doctors[]> {
+    return await this.doctorRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} doctor`;
+  async findOne(id: UUID): Promise<Doctors | null> {
+    return await this.doctorRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateDoctorDto: UpdateDoctorDto) {
-    return updateDoctorDto;
+  async update(
+    id: UUID,
+    updateDoctorDto: UpdateDoctorDto,
+  ): Promise<Doctors | null> {
+    await this.doctorRepository.update(id, updateDoctorDto);
+    return await this.doctorRepository.findOne({ where: { id } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} doctor`;
+  async remove(id: UUID): Promise<void> {
+    await this.doctorRepository.delete(id);
   }
 }
