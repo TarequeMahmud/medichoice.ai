@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
+import { UUID } from 'crypto';
 
 @Controller('doctors')
 export class DoctorsController {
@@ -18,17 +19,12 @@ export class DoctorsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.doctorsService.findOne(+id);
+  findOne(@Param('id') id: UUID) {
+    return this.doctorsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDoctorDto: UpdateDoctorDto) {
-    return this.doctorsService.update(+id, updateDoctorDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.doctorsService.remove(+id);
+  update(@Param('id') id: UUID, @Body() updateDoctorDto: UpdateDoctorDto) {
+    return this.doctorsService.update(id, updateDoctorDto);
   }
 }
