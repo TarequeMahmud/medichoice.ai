@@ -1,17 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { Repository } from 'typeorm';
 import { Doctors } from './entities/doctor.entity';
 import { UUID } from 'crypto';
+import { UsersService } from 'src/users/users.service';
+import { rethrowIfError } from 'src/common/utils/rethrowIfError';
 
 @Injectable()
 export class DoctorsService {
-  constructor(private doctorRepository: Repository<Doctors>) {}
+  constructor(
+    @Inject('DOCTOR_REPOSITORY')
+    private doctorRepository: Repository<Doctors>,
+    private userService: UsersService,
+  ) {}
 
-  async create(createDoctorDto: CreateDoctorDto): Promise<Doctors> {
-    const doctor = this.doctorRepository.create(createDoctorDto);
-    return await this.doctorRepository.save(doctor);
+  async create(
+    userId: UUID,
+    createDoctorDto: CreateDoctorDto,
+  ): Promise<Doctors> {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isExists = await this.findOne(userId);
+    if (isExists) {
+      throw new ConflictException('Doctor profile already exists');
+    }
+
+    const newDoctorProfile = this.doctorRepository.create({
+      ...createDoctorDto,
+      id: userId,
+    });
+    await this.doctorRepository.save(newDoctorProfile);
+    return newDoctorProfile;
   }
 
   async findAll(): Promise<Doctors[]> {
@@ -26,11 +54,21 @@ export class DoctorsService {
     id: UUID,
     updateDoctorDto: UpdateDoctorDto,
   ): Promise<Doctors | null> {
-    await this.doctorRepository.update(id, updateDoctorDto);
-    return await this.doctorRepository.findOne({ where: { id } });
+    try {
+      const doctor = await this.findOne(id);
+      if (!doctor) {
+        return null;
+      }
+      Object.assign(doctor, updateDoctorDto);
+      const updatedDoctor = await this.doctorRepository.save(doctor);
+      return updatedDoctor;
+    } catch (error: unknown) {
+      throw rethrowIfError;
+    }
   }
 
-  async remove(id: UUID): Promise<void> {
-    await this.doctorRepository.delete(id);
+  async remove(id: UUID): Promise<boolean> {
+    const result = await this.doctorRepository.delete(id);
+    return typeof result.affected === 'number' && result.affected > 0;
   }
 }

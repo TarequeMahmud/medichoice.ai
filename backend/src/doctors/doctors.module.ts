@@ -3,9 +3,10 @@ import { DoctorsService } from './doctors.service';
 import { DoctorsController } from './doctors.controller';
 import { DatabaseModule } from 'src/database/database.module';
 import { doctorProviders } from './doctors.providers';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, UsersModule],
   controllers: [DoctorsController],
   providers: [...doctorProviders, DoctorsService],
   exports: [DoctorsService],
