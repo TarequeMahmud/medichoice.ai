@@ -16,6 +16,7 @@ import { UUID } from 'crypto';
 import { RequestWithUser } from 'src/common/types/auth';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { AppointmentStatus } from './entities/appointment.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('access-token')
@@ -48,6 +49,13 @@ export class AppointmentsController {
     @Body() updateAppointmentDto: UpdateAppointmentDto,
   ) {
     return this.appointmentsService.update(id, updateAppointmentDto);
+  }
+  @Patch(':id/approve')
+  approve(@Param('id') id: UUID) {
+    return this.appointmentsService.changeStatus(
+      id,
+      AppointmentStatus.APPROVED,
+    );
   }
 
   @Delete(':id')

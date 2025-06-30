@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
-import { Appointments } from './entities/appointment.entity';
+import { Appointments, AppointmentStatus } from './entities/appointment.entity';
 import { Repository } from 'typeorm';
 import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
@@ -55,6 +55,14 @@ export class AppointmentsService {
   ): Promise<Appointments | null> {
     await this.appointmentRepository.update(id, updateAppointmentDto);
     return await this.appointmentRepository.findOne({ where: { id } });
+  }
+
+  async changeStatus(id: UUID, status: AppointmentStatus): Promise<void> {
+    let updateStatusDto: UpdateAppointmentDto = { status };
+    if (status === AppointmentStatus.APPROVED) {
+      updateStatusDto.admin_approved = true;
+    }
+    await this.update(id, updateStatusDto);
   }
 
   async remove(id: UUID): Promise<void> {
