@@ -58,6 +58,14 @@ export class AppointmentsController {
     );
   }
 
+  @Patch(':id/decline')
+  decline(@Param('id') id: UUID) {
+    return this.appointmentsService.changeStatus(
+      id,
+      AppointmentStatus.DECLINED,
+    );
+  }
+
   @Delete(':id')
   remove(@Param('id') id: UUID) {
     return this.appointmentsService.remove(id);

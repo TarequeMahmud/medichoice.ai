@@ -62,6 +62,9 @@ export class AppointmentsService {
     if (status === AppointmentStatus.APPROVED) {
       updateStatusDto.admin_approved = true;
     }
+    if (status === AppointmentStatus.DECLINED) {
+      updateStatusDto.admin_approved = false;
+    }
     await this.update(id, updateStatusDto);
   }
 
