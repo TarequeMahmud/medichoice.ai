@@ -6,19 +6,30 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { UUID } from 'crypto';
+import { RequestWithUser } from 'src/common/types/auth';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentsService.create(createAppointmentDto);
+  create(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user.userId;
+    return this.appointmentsService.create(userId, createAppointmentDto);
   }
 
   @Get()
