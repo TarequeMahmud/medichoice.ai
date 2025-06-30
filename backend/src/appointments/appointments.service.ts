@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Appointments, AppointmentStatus } from './entities/appointment.entity';
@@ -64,6 +69,15 @@ export class AppointmentsService {
     }
     if (status === AppointmentStatus.DECLINED) {
       updateStatusDto.admin_approved = false;
+    }
+
+    if (status === AppointmentStatus.COMPLETED) {
+      const appointment = await this.findOne(id);
+      if (appointment && !appointment.admin_approved) {
+        throw new BadRequestException(
+          'Cannot complete appointment: it is not approved by admin yet.',
+        );
+      }
     }
     await this.update(id, updateStatusDto);
   }

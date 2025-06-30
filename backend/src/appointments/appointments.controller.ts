@@ -66,6 +66,14 @@ export class AppointmentsController {
     );
   }
 
+  @Patch(':id/complete')
+  complete(@Param('id') id: UUID) {
+    return this.appointmentsService.changeStatus(
+      id,
+      AppointmentStatus.COMPLETED,
+    );
+  }
+
   @Delete(':id')
   remove(@Param('id') id: UUID) {
     return this.appointmentsService.remove(id);
