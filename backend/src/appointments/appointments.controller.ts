@@ -17,14 +17,18 @@ import { RequestWithUser } from 'src/common/types/auth';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AppointmentStatus } from './entities/appointment.entity';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/users/entities/user.entity';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('access-token')
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
+  @Roles(UserRole.PATIENT)
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
     @Req() req: RequestWithUser,
@@ -34,23 +38,28 @@ export class AppointmentsController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN)
   findAll() {
     return this.appointmentsService.findAll();
   }
 
   @Get(':id')
+  @Roles(UserRole.PATIENT, UserRole.DOCTOR, UserRole.ADMIN)
   findOne(@Param('id') id: UUID) {
     return this.appointmentsService.findOne(id);
   }
 
   @Patch(':id')
+  @Roles(UserRole.PATIENT)
   update(
     @Param('id') id: UUID,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
   ) {
     return this.appointmentsService.update(id, updateAppointmentDto);
   }
+
   @Patch(':id/approve')
+  @Roles(UserRole.ADMIN)
   approve(@Param('id') id: UUID) {
     return this.appointmentsService.changeStatus(
       id,
@@ -59,6 +68,7 @@ export class AppointmentsController {
   }
 
   @Patch(':id/decline')
+  @Roles(UserRole.ADMIN, UserRole.DOCTOR)
   decline(@Param('id') id: UUID) {
     return this.appointmentsService.changeStatus(
       id,
@@ -67,6 +77,7 @@ export class AppointmentsController {
   }
 
   @Patch(':id/complete')
+  @Roles(UserRole.PATIENT, UserRole.DOCTOR)
   complete(@Param('id') id: UUID) {
     return this.appointmentsService.changeStatus(
       id,
@@ -75,6 +86,7 @@ export class AppointmentsController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.PATIENT, UserRole.ADMIN)
   remove(@Param('id') id: UUID) {
     return this.appointmentsService.remove(id);
   }
