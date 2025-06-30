@@ -9,29 +9,33 @@ import { UUID } from 'crypto';
 export class AppointmentsService {
   constructor(
     @Inject('APPOINTMENT_REPOSITORY')
-    private patientRepository: Repository<Appointments>,
+    private appointmentRepository: Repository<Appointments>,
   ) {}
 
   async create(
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<Appointments> {
-    const appointment = this.patientRepository.create(createAppointmentDto);
-    return await this.patientRepository.save(appointment);
+    const appointment = this.appointmentRepository.create(createAppointmentDto);
+    return await this.appointmentRepository.save(appointment);
   }
 
   async findAll(): Promise<Appointments[]> {
-    return await this.patientRepository.find();
+    return await this.appointmentRepository.find();
   }
 
   async findOne(id: UUID): Promise<Appointments | null> {
-    return await this.patientRepository.findOne({ where: { id } });
+    return await this.appointmentRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    return updateAppointmentDto;
+  async update(
+    id: UUID,
+    updateAppointmentDto: UpdateAppointmentDto,
+  ): Promise<Appointments | null> {
+    await this.appointmentRepository.update(id, updateAppointmentDto);
+    return await this.appointmentRepository.findOne({ where: { id } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} appointment`;
+  async remove(id: UUID): Promise<void> {
+    await this.appointmentRepository.delete(id);
   }
 }

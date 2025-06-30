@@ -33,14 +33,14 @@ export class AppointmentsController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: UUID,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
   ) {
-    return this.appointmentsService.update(+id, updateAppointmentDto);
+    return this.appointmentsService.update(id, updateAppointmentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.appointmentsService.remove(+id);
+  remove(@Param('id') id: UUID) {
+    return this.appointmentsService.remove(id);
   }
 }
