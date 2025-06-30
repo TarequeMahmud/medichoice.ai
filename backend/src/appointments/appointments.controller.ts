@@ -6,19 +6,31 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { UUID } from 'crypto';
+import { RequestWithUser } from 'src/common/types/auth';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AppointmentStatus } from './entities/appointment.entity';
 
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentsService.create(createAppointmentDto);
+  create(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user.userId;
+    return this.appointmentsService.create(userId, createAppointmentDto);
   }
 
   @Get()
@@ -37,6 +49,29 @@ export class AppointmentsController {
     @Body() updateAppointmentDto: UpdateAppointmentDto,
   ) {
     return this.appointmentsService.update(id, updateAppointmentDto);
+  }
+  @Patch(':id/approve')
+  approve(@Param('id') id: UUID) {
+    return this.appointmentsService.changeStatus(
+      id,
+      AppointmentStatus.APPROVED,
+    );
+  }
+
+  @Patch(':id/decline')
+  decline(@Param('id') id: UUID) {
+    return this.appointmentsService.changeStatus(
+      id,
+      AppointmentStatus.DECLINED,
+    );
+  }
+
+  @Patch(':id/complete')
+  complete(@Param('id') id: UUID) {
+    return this.appointmentsService.changeStatus(
+      id,
+      AppointmentStatus.COMPLETED,
+    );
   }
 
   @Delete(':id')
