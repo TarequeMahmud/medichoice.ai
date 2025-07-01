@@ -11,6 +11,7 @@ import { Doctors } from './entities/doctor.entity';
 import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
 import { rethrowIfError } from 'src/common/utils/rethrowIfError';
+import { AppointmentsService } from 'src/appointments/appointments.service';
 
 @Injectable()
 export class DoctorsService {
@@ -18,6 +19,7 @@ export class DoctorsService {
     @Inject('DOCTOR_REPOSITORY')
     private doctorRepository: Repository<Doctors>,
     private userService: UsersService,
+    private appointmentService: AppointmentsService,
   ) {}
 
   async create(
@@ -48,6 +50,16 @@ export class DoctorsService {
 
   async findOne(id: UUID): Promise<Doctors | null> {
     return await this.doctorRepository.findOne({ where: { id } });
+  }
+
+  async findAllAppointmentsByUserId(userId: UUID) {
+    console.log(userId);
+
+    const doctor = await this.findOne(userId);
+    if (!doctor) {
+      throw new NotFoundException('Doctor not found');
+    }
+    return this.appointmentService.findAllByDoctorId(userId);
   }
 
   async update(

@@ -9,5 +9,6 @@ import { UsersModule } from 'src/users/users.module';
   imports: [DatabaseModule, UsersModule],
   controllers: [AppointmentsController],
   providers: [...appointmentProviders, AppointmentsService],
+  exports: [AppointmentsService],
 })
 export class AppointmentsModule {}

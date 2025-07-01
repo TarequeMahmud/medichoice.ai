@@ -40,6 +40,14 @@ export class DoctorsController {
   findAll() {
     return this.doctorsService.findAll();
   }
+
+  @Roles(UserRole.DOCTOR)
+  @Get('appointments')
+  findAllAppointments(@Req() req: RequestWithUser) {
+    const doctorId = req.user.userId;
+    return this.doctorsService.findAllAppointmentsByUserId(doctorId);
+  }
+
   @Roles(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT)
   @Get(':id')
   findOne(@Param('id') id: UUID) {
