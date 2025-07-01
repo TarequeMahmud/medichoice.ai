@@ -68,6 +68,13 @@ export class RecordsService {
     });
   }
 
+  async findAllByPatientId(patientId: UUID): Promise<Record[]> {
+    return await this.recordRepository.find({
+      where: { patient: { id: patientId } },
+      relations: ['doctor', 'patient', 'appointment'],
+    });
+  }
+
   async findOne(id: UUID) {
     const record = await this.recordRepository.findOne({
       where: { id },

@@ -10,6 +10,8 @@ import { Repository } from 'typeorm';
 import { Patients } from './entities/patient.entity';
 import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
+import { AppointmentsService } from 'src/appointments/appointments.service';
+import { RecordsService } from 'src/records/records.service';
 
 @Injectable()
 export class PatientsService {
@@ -17,6 +19,8 @@ export class PatientsService {
     @Inject('PATIENT_REPOSITORY')
     private patientRepository: Repository<Patients>,
     private userService: UsersService,
+    private readonly appointmentService: AppointmentsService,
+    private readonly recordService: RecordsService,
   ) {}
   async create(
     userId: UUID,
@@ -42,6 +46,27 @@ export class PatientsService {
 
   async findOne(id: UUID): Promise<Patients | null> {
     return await this.patientRepository.findOne({ where: { id } });
+  }
+
+  async getAppointmentsByUserId(userId: UUID) {
+    const patient = await this.userService.findOne(userId);
+    if (!patient) {
+      throw new NotFoundException('Patient not found');
+    }
+
+    return await this.appointmentService
+      .findAllByPatientId(userId)
+      .then((res) => res || []);
+  }
+
+  async getRecordsByUserId(userId: UUID) {
+    const patient = await this.userService.findOne(userId);
+    if (!patient) {
+      throw new NotFoundException('Patient not found');
+    }
+    return await this.recordService
+      .findAllByPatientId(userId)
+      .then((res) => res || []);
   }
 
   async update(

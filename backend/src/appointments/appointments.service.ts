@@ -61,6 +61,13 @@ export class AppointmentsService {
     });
   }
 
+  async findAllByPatientId(patientId: UUID): Promise<Appointments[]> {
+    return await this.appointmentRepository.find({
+      where: { patient: { id: patientId } },
+      relations: ['doctor', 'patient'],
+    });
+  }
+
   async update(
     id: UUID,
     updateAppointmentDto: UpdateAppointmentDto,

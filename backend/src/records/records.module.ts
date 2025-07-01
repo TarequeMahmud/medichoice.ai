@@ -10,5 +10,6 @@ import { AppointmentsModule } from 'src/appointments/appointments.module';
   imports: [DatabaseModule, UsersModule, AppointmentsModule],
   controllers: [RecordsController],
   providers: [...recordProviders, RecordsService],
+  exports: [RecordsService],
 })
 export class RecordsModule {}
