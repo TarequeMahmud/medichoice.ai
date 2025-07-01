@@ -36,21 +36,29 @@ export class RecordsController {
     return this.recordsService.create(userId, createRecordDto);
   }
 
+  @Roles(UserRole.ADMIN)
   @Get()
   findAll() {
     return this.recordsService.findAll();
   }
 
+  @Roles(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT)
   @Get(':id')
   findOne(@Param('id') id: UUID) {
     return this.recordsService.findOne(id);
   }
 
+  @Roles(UserRole.DOCTOR)
   @Patch(':id')
-  update(@Param('id') id: UUID, @Body() updateRecordDto: UpdateRecordDto) {
-    return this.recordsService.update(id, updateRecordDto);
+  update(
+    @Param('id') id: UUID,
+    @Body() updateRecordDto: UpdateRecordDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user.userId as UUID;
+    return this.recordsService.update(id, userId, updateRecordDto);
   }
-
+  @Roles(UserRole.DOCTOR)
   @Delete(':id')
   remove(@Param('id') id: UUID) {
     return this.recordsService.remove(id);
