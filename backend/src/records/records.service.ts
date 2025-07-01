@@ -2,7 +2,7 @@ import { Inject, Injectable, ForbiddenException } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { Repository } from 'typeorm';
-import { Record } from './entities/record.entity';
+import { Record, Records } from './entities/record.entity';
 import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
 import { AppointmentsService } from 'src/appointments/appointments.service';
@@ -79,11 +79,25 @@ export class RecordsService {
     return record;
   }
 
-  async update(id: UUID, updateRecordDto: UpdateRecordDto) {
-    const record = await this.recordRepository.findOne({ where: { id } });
+  async update(
+    id: UUID,
+    doctorId: UUID,
+    updateRecordDto: UpdateRecordDto,
+  ): Promise<Record> {
+    const [doctor, record] = await Promise.all([
+      this.userService.findOne(doctorId),
+      this.recordRepository.findOne({ where: { id }, relations: ['doctor'] }),
+    ]);
+
+    if (!doctor || doctor.role !== 'doctor') {
+      throw new ForbiddenException(
+        'You are not authorized to update this record.',
+      );
+    }
     if (!record) {
       throw new ForbiddenException(`Record with id ${id} not found.`);
     }
+
     Object.assign(record, updateRecordDto);
     return this.recordRepository.save(record);
   }
