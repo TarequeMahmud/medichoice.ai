@@ -47,12 +47,12 @@ export class RecordsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRecordDto: UpdateRecordDto) {
-    return this.recordsService.update(+id, updateRecordDto);
+  update(@Param('id') id: UUID, @Body() updateRecordDto: UpdateRecordDto) {
+    return this.recordsService.update(id, updateRecordDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recordsService.remove(+id);
+  remove(@Param('id') id: UUID) {
+    return this.recordsService.remove(id);
   }
 }

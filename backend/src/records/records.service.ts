@@ -62,19 +62,38 @@ export class RecordsService {
     return this.recordRepository.save(record);
   }
 
-  findAll() {
-    return `This action returns all records`;
+  async findAll() {
+    return this.recordRepository.find({
+      relations: ['doctor', 'patient', 'appointment'],
+    });
   }
 
-  findOne(id: UUID) {
-    return `This action returns a #${id} record`;
+  async findOne(id: UUID) {
+    const record = await this.recordRepository.findOne({
+      where: { id },
+      relations: ['doctor', 'patient', 'appointment'],
+    });
+    if (!record) {
+      throw new ForbiddenException(`Record with id ${id} not found.`);
+    }
+    return record;
   }
 
-  update(id: number, updateRecordDto: UpdateRecordDto) {
-    return updateRecordDto;
+  async update(id: UUID, updateRecordDto: UpdateRecordDto) {
+    const record = await this.recordRepository.findOne({ where: { id } });
+    if (!record) {
+      throw new ForbiddenException(`Record with id ${id} not found.`);
+    }
+    Object.assign(record, updateRecordDto);
+    return this.recordRepository.save(record);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} record`;
+  async remove(id: UUID) {
+    const record = await this.recordRepository.findOne({ where: { id } });
+    if (!record) {
+      throw new ForbiddenException(`Record with id ${id} not found.`);
+    }
+    await this.recordRepository.remove(record);
+    return { message: `Record with id ${id} removed.` };
   }
 }
