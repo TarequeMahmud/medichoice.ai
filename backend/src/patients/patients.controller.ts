@@ -36,6 +36,20 @@ export class PatientsController {
     return this.patientsService.create(userId, createPatientDto);
   }
 
+  @Roles(UserRole.PATIENT)
+  @Get('me/appointments')
+  getMyAppointments(@Req() req: RequestWithUser) {
+    const userId = req.user.userId;
+    return this.patientsService.getAppointmentsByUserId(userId);
+  }
+
+  @Roles(UserRole.PATIENT)
+  @Get('me/records')
+  getMyRecords(@Req() req: RequestWithUser) {
+    const userId = req.user.userId;
+    return this.patientsService.getRecordsByUserId(userId);
+  }
+
   @Roles(UserRole.PATIENT, UserRole.ADMIN, UserRole.DOCTOR)
   @Get(':id')
   findOne(@Param('id') id: UUID) {
