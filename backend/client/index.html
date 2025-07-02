@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO NestJS Test</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h2>Chat</h2>
+    <input id="msgInput" placeholder="Message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <ul id="messages"></ul>
+
+    <script>
+      const socket = io('http://localhost:3000'); // adjust port if needed
+
+      socket.on('connect', () => {
+        console.log('Connected:', socket.id);
+      });
+
+      socket.on('receiveMessage', (data) => {
+        const msgEl = document.createElement('li');
+        msgEl.textContent = `${data.senderId}: ${data.content}`;
+        document.getElementById('messages').appendChild(msgEl);
+      });
+
+      function sendMessage() {
+        const content = document.getElementById('msgInput').value;
+        socket.emit('sendMessage', {
+          senderId: 'test-user-1',
+          receiverId: 'test-user-2',
+          content,
+        });
+        document.getElementById('msgInput').value = '';
+      }
+    </script>
+  </body>
+</html>
