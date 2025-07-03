@@ -10,6 +10,8 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { MessagesService } from './messages.service';
+import { SendMessageDto } from './dto/send-message.dto';
 
 @WebSocketGateway()
 export class MessagesGateway
@@ -17,6 +19,8 @@ export class MessagesGateway
 {
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('MessageGateway');
+
+  constructor(private readonly messagesService: MessagesService) {}
 
   afterInit(server: Server) {
     this.logger.log('message socket initialised');
@@ -42,14 +46,21 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('sendMessage')
-  handleMessage(
+  async handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    data: { senderId: string; receiverId: string; content: string },
-  ): void {
+    data: SendMessageDto,
+  ): Promise<void> {
     const room = `room-${data.receiverId}-${data.senderId}`;
     console.log('room is:', room);
-    this.server.to(room).emit('receiveMessage', data);
+    const messageData = await this.messagesService.create(data);
+
+    const message = {
+      name: messageData.sender.full_name,
+      message: messageData.message,
+    };
+    console.log(message);
+    this.server.to(room).emit('receiveMessage', message);
     this.logger.log(`Message from ${data.senderId}: ${data.content}`);
   }
 }

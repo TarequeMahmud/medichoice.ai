@@ -73,7 +73,7 @@
         console.log('data', data);
 
         const li = document.createElement('li');
-        li.textContent = `${data.senderId}: ${data.content}`;
+        li.textContent = `${data.name}: ${data.message}`;
         document.getElementById('messages').appendChild(li);
       });
 
