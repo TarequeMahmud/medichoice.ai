@@ -13,20 +13,16 @@ export class MessagesService {
     private userService: UsersService,
   ) {}
 
-  async create(sendMessageDto: SendMessageDto): Promise<Messages> {
+  async create(
+    sendMessageDto: SendMessageDto,
+    room: string,
+  ): Promise<Messages> {
     const { senderId, receiverId, content } = sendMessageDto;
-    let room: string;
 
     const [sender, receiver] = await Promise.all([
       this.userService.findOne(senderId as UUID),
       this.userService.findOne(receiverId as UUID),
     ]);
-
-    if (sender.role === 'doctor') {
-      room = `room-${senderId}-${receiverId}`;
-    } else {
-      room = `room-${receiverId}-${senderId}`;
-    }
 
     const message = this.messageRepository.create({
       sender,

@@ -12,6 +12,7 @@
       button {
         margin: 5px 0;
         padding: 8px;
+        width: 100%;
       }
       ul {
         list-style: none;
@@ -25,69 +26,72 @@
   <body>
     <h2>Doctor-Patient Chat</h2>
 
-    <div>
-      <label for="doctorId">Doctor ID:</label>
-      <input id="doctorId" placeholder="Doctor UUID" />
-      <br />
-      <label for="patientId">Patient ID:</label>
-      <input id="patientId" placeholder="Patient UUID" />
-      <br />
-      <button onclick="joinRoom()">Join Chat Room</button>
-    </div>
+    <label for="token">JWT Token (Paste after login):</label>
+    <input id="token" placeholder="Bearer token" />
+
+    <label for="receiverId">Receiver ID:</label>
+    <input id="receiverId" placeholder="Doctor/Patient UUID" />
+
+    <button onclick="connect()">Connect & Join Room</button>
 
     <div id="chatSection" style="display: none">
-      <h3>Chat Messages</h3>
-      <input id="msgInput" placeholder="Type a message..." />
+      <h3>Chat</h3>
+      <input id="msgInput" placeholder="Type your message..." />
       <button onclick="sendMessage()">Send</button>
       <ul id="messages"></ul>
     </div>
 
     <script>
-      const socket = io('http://localhost:3000');
+      let socket;
+      let receiverId = '';
+      let token = '';
 
-      socket.on('connect', () => {
-        console.log('Connected to socket:', socket.id);
-      });
+      function connect() {
+        token = document.getElementById('token').value.trim();
+        receiverId = document.getElementById('receiverId').value.trim();
 
-      function joinRoom() {
-        const doctorId = document.getElementById('doctorId').value.trim();
-        const patientId = document.getElementById('patientId').value.trim();
-
-        if (!doctorId || !patientId) {
-          alert('Please enter both doctor and patient IDs.');
+        if (!token || !receiverId) {
+          alert('Please enter both token and receiver ID.');
           return;
         }
 
-        socket.emit('joinRoom', { doctorId, patientId });
-        document.getElementById('chatSection').style.display = 'block';
-        console.log(
-          `Joined room for doctor ${doctorId} and patient ${patientId}`,
-        );
+        // Create socket connection with JWT in handshake
+        socket = io('http://localhost:3000', {
+          auth: {
+            token,
+          },
+        });
+
+        socket.on('connect', () => {
+          console.log('Connected with ID:', socket.id);
+
+          // Request room join
+          socket.emit('joinRoom', { receiverId });
+          document.getElementById('chatSection').style.display = 'block';
+        });
+
+        socket.on('joinedRoom', (data) => {
+          console.log('Joined room:', data.room);
+        });
+
+        socket.on('receiveMessage', (data) => {
+          const li = document.createElement('li');
+          li.textContent = `${data.name}: ${data.content}`;
+          document.getElementById('messages').appendChild(li);
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Socket error:', err.message);
+          alert('Socket connection failed: ' + err.message);
+        });
       }
-
-      socket.on('joinedRoom', (data) => {
-        console.log('Joined room:', data.room);
-      });
-
-      socket.on('receiveMessage', (data) => {
-        console.log('data', data);
-
-        const li = document.createElement('li');
-        li.textContent = `${data.name}: ${data.message}`;
-        document.getElementById('messages').appendChild(li);
-      });
 
       function sendMessage() {
         const content = document.getElementById('msgInput').value;
-        const doctorId = document.getElementById('doctorId').value.trim();
-        const patientId = document.getElementById('patientId').value.trim();
-        const senderId = patientId; // for testing assume patient is sender
-
         if (!content) return;
 
         socket.emit('sendMessage', {
-          senderId,
-          receiverId: doctorId,
+          receiverId,
           content,
         });
 

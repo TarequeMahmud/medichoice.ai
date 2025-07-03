@@ -7,11 +7,13 @@ import { MessagesGateway } from './messages.gateway';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { UsersModule } from 'src/users/users.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     DatabaseModule,
     UsersModule,
+    AuthModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../client'),
       exclude: ['/api/{*test}'],
