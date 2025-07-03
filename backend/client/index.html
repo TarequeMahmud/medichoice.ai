@@ -1,36 +1,100 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO NestJS Test</title>
+    <title>Doctor-Patient Chat</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      input,
+      button {
+        margin: 5px 0;
+        padding: 8px;
+        width: 100%;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 5px;
+      }
+    </style>
   </head>
   <body>
-    <h2>Chat</h2>
-    <input id="msgInput" placeholder="Message..." />
-    <button onclick="sendMessage()">Send</button>
+    <h2>Doctor-Patient Chat</h2>
 
-    <ul id="messages"></ul>
+    <label for="token">JWT Token (Paste after login):</label>
+    <input id="token" placeholder="Bearer token" />
+
+    <label for="receiverId">Receiver ID:</label>
+    <input id="receiverId" placeholder="Doctor/Patient UUID" />
+
+    <button onclick="connect()">Connect & Join Room</button>
+
+    <div id="chatSection" style="display: none">
+      <h3>Chat</h3>
+      <input id="msgInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+      <ul id="messages"></ul>
+    </div>
 
     <script>
-      const socket = io('http://localhost:3000'); // adjust port if needed
+      let socket;
+      let receiverId = '';
+      let token = '';
 
-      socket.on('connect', () => {
-        console.log('Connected:', socket.id);
-      });
+      function connect() {
+        token = document.getElementById('token').value.trim();
+        receiverId = document.getElementById('receiverId').value.trim();
 
-      socket.on('receiveMessage', (data) => {
-        const msgEl = document.createElement('li');
-        msgEl.textContent = `${data.senderId}: ${data.content}`;
-        document.getElementById('messages').appendChild(msgEl);
-      });
+        if (!token || !receiverId) {
+          alert('Please enter both token and receiver ID.');
+          return;
+        }
+
+        // Create socket connection with JWT in handshake
+        socket = io('http://localhost:3000', {
+          auth: {
+            token,
+          },
+        });
+
+        socket.on('connect', () => {
+          console.log('Connected with ID:', socket.id);
+
+          // Request room join
+          socket.emit('joinRoom', { receiverId });
+          document.getElementById('chatSection').style.display = 'block';
+        });
+
+        socket.on('joinedRoom', (data) => {
+          console.log('Joined room:', data.room);
+        });
+
+        socket.on('receiveMessage', (data) => {
+          const li = document.createElement('li');
+          li.textContent = `${data.name}: ${data.content}`;
+          document.getElementById('messages').appendChild(li);
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Socket error:', err.message);
+          alert('Socket connection failed: ' + err.message);
+        });
+      }
 
       function sendMessage() {
         const content = document.getElementById('msgInput').value;
+        if (!content) return;
+
         socket.emit('sendMessage', {
-          senderId: 'test-user-1',
-          receiverId: 'test-user-2',
+          receiverId,
           content,
         });
+
         document.getElementById('msgInput').value = '';
       }
     </script>

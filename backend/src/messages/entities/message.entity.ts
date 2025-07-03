@@ -26,15 +26,6 @@ export class Messages {
   @ApiProperty({ description: 'Receiver of the message', type: () => Users })
   receiver: Users;
 
-  @ManyToOne(() => Appointments, { onDelete: 'SET NULL', nullable: true })
-  @JoinColumn({ name: 'appointment_id' })
-  @ApiProperty({
-    description: 'Optional appointment linked to message',
-    type: () => Appointments,
-    required: false,
-  })
-  appointment?: Appointments;
-
   @Column('text')
   @ApiProperty({
     description: 'Text content of the message',
@@ -42,7 +33,14 @@ export class Messages {
   })
   message: string;
 
-  @CreateDateColumn({ name: 'sent_at' })
+  @Column()
+  @ApiProperty({
+    description: 'Room ID based on doctor and patient combination',
+    example: 'uuid-d1-uuid-p1',
+  })
+  room: string;
+
+  @CreateDateColumn({ name: 'sent_at', default: () => 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     description: 'When the message was sent',
     example: '2025-06-23T12:00:00Z',
