@@ -7,6 +7,7 @@ import {
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -14,6 +15,7 @@ import { Server, Socket } from 'socket.io';
 export class MessagesGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  @WebSocketServer() server: Server;
   private logger: Logger = new Logger('MessageGateway');
 
   afterInit(server: Server) {
@@ -28,13 +30,26 @@ export class MessagesGateway
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(
+    @MessageBody() data: { doctorId: string; patientId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const room = `room-${data.doctorId}-${data.patientId}`;
+    client.join(room);
+    this.logger.log('joined room', { room });
+    client.emit('joined room', { room });
+  }
+
   @SubscribeMessage('sendMessage')
   handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
     data: { senderId: string; receiverId: string; content: string },
   ): void {
+    const room = `room-${data.receiverId}-${data.senderId}`;
+    console.log('room is:', room);
+    this.server.to(room).emit('receiveMessage', data);
     this.logger.log(`Message from ${data.senderId}: ${data.content}`);
-    client.broadcast.emit('recieveMessage', data);
   }
 }

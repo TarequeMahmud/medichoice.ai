@@ -1,36 +1,96 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO NestJS Test</title>
+    <title>Doctor-Patient Chat</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      input,
+      button {
+        margin: 5px 0;
+        padding: 8px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 5px;
+      }
+    </style>
   </head>
   <body>
-    <h2>Chat</h2>
-    <input id="msgInput" placeholder="Message..." />
-    <button onclick="sendMessage()">Send</button>
+    <h2>Doctor-Patient Chat</h2>
 
-    <ul id="messages"></ul>
+    <div>
+      <label for="doctorId">Doctor ID:</label>
+      <input id="doctorId" placeholder="Doctor UUID" />
+      <br />
+      <label for="patientId">Patient ID:</label>
+      <input id="patientId" placeholder="Patient UUID" />
+      <br />
+      <button onclick="joinRoom()">Join Chat Room</button>
+    </div>
+
+    <div id="chatSection" style="display: none">
+      <h3>Chat Messages</h3>
+      <input id="msgInput" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+      <ul id="messages"></ul>
+    </div>
 
     <script>
-      const socket = io('http://localhost:3000'); // adjust port if needed
+      const socket = io('http://localhost:3000');
 
       socket.on('connect', () => {
-        console.log('Connected:', socket.id);
+        console.log('Connected to socket:', socket.id);
+      });
+
+      function joinRoom() {
+        const doctorId = document.getElementById('doctorId').value.trim();
+        const patientId = document.getElementById('patientId').value.trim();
+
+        if (!doctorId || !patientId) {
+          alert('Please enter both doctor and patient IDs.');
+          return;
+        }
+
+        socket.emit('joinRoom', { doctorId, patientId });
+        document.getElementById('chatSection').style.display = 'block';
+        console.log(
+          `Joined room for doctor ${doctorId} and patient ${patientId}`,
+        );
+      }
+
+      socket.on('joinedRoom', (data) => {
+        console.log('Joined room:', data.room);
       });
 
       socket.on('receiveMessage', (data) => {
-        const msgEl = document.createElement('li');
-        msgEl.textContent = `${data.senderId}: ${data.content}`;
-        document.getElementById('messages').appendChild(msgEl);
+        console.log('data', data);
+
+        const li = document.createElement('li');
+        li.textContent = `${data.senderId}: ${data.content}`;
+        document.getElementById('messages').appendChild(li);
       });
 
       function sendMessage() {
         const content = document.getElementById('msgInput').value;
+        const doctorId = document.getElementById('doctorId').value.trim();
+        const patientId = document.getElementById('patientId').value.trim();
+        const senderId = patientId; // for testing assume patient is sender
+
+        if (!content) return;
+
         socket.emit('sendMessage', {
-          senderId: 'test-user-1',
-          receiverId: 'test-user-2',
+          senderId,
+          receiverId: doctorId,
           content,
         });
+
         document.getElementById('msgInput').value = '';
       }
     </script>
