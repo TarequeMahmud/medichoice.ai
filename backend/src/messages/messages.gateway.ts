@@ -35,7 +35,7 @@ export class MessagesGateway
 
     if (!token) {
       client.disconnect();
-      throw new UnauthorizedException('You are unauthorized');
+      console.warn('Connection rejected: No token provided');
     }
 
     try {
@@ -44,31 +44,42 @@ export class MessagesGateway
       console.log(payload);
     } catch (error) {
       client.disconnect();
-      throw new UnauthorizedException('Invalid token');
+      console.warn('Connection rejected: Invalid token');
     }
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+    this.logger.log(`Client disconnected: ${client.data.user.email}`);
   }
 
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(
-    @MessageBody() data: { recieverId: string },
+  async handleJoinRoom(
+    @MessageBody() data: { receiverId: string },
     @ConnectedSocket() client: Socket,
   ) {
     let room: string;
     const sender = client.data.user;
+    console.log('the reciever is: ', data.receiverId);
+
     if (sender.role === 'doctor') {
-      room = `room-${sender.sub}-${data.recieverId}`;
+      room = `room-${sender.sub}-${data.receiverId}`;
     } else {
-      room = `room-${data.recieverId}-${sender.sub}`;
+      room = `room-${data.receiverId}-${sender.sub}`;
     }
 
     client.join(room);
     client.data.room = room;
-    this.logger.log('joined room', { room });
-    client.emit('joined room', { room });
+    this.logger.log('joined room: ', room);
+    const getPreviousMessage = await this.messagesService.findByRoom(room);
+
+    const messages = getPreviousMessage.map((message) => ({
+      name: message.sender.full_name,
+      message: message.message,
+    }));
+
+    for (const msg of messages) {
+      client.emit('receiveMessage', msg);
+    }
   }
 
   @SubscribeMessage('sendMessage')
@@ -87,6 +98,6 @@ export class MessagesGateway
     };
     console.log(message);
     this.server.to(room).emit('receiveMessage', message);
-    this.logger.log(`Message from ${data.senderId}: ${data.content}`);
+    this.logger.log(data);
   }
 }
