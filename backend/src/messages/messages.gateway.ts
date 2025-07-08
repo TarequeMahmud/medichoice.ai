@@ -1,4 +1,4 @@
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -13,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { MessagesService } from './messages.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from 'src/users/entities/user.entity';
 
 @WebSocketGateway()
 export class MessagesGateway
@@ -40,6 +41,12 @@ export class MessagesGateway
 
     try {
       const payload = this.jwtService.verify(token);
+      if (![UserRole.DOCTOR, UserRole.PATIENT].includes(payload.role)) {
+        client.emit('auth error:', { message: 'Forbidden role' });
+        client.disconnect(true);
+        this.logger.warn(`Connection rejected: Invalid role ${payload.role}`);
+        return;
+      }
       client.data.user = payload;
       console.log(payload);
     } catch (error) {
