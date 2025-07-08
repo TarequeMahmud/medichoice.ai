@@ -33,7 +33,10 @@ export class MessagesService {
     return this.messageRepository.save(message);
   }
 
-  // async getMessage(id: number): Promise<Messages | null> {
-  //   return this.messageRepository.findOne({ where: { id } });
-  // }
+  async findByRoom(room: string): Promise<Messages[]> {
+    return this.messageRepository.find({
+      where: { room },
+      relations: ['sender', 'receiver'],
+    });
+  }
 }
