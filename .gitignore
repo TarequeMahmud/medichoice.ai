@@ -15,6 +15,7 @@ node_modules
 /build
 /dist
 /.next
+/frontend/.next
 /out
 
 # --- Logs and debug ---
