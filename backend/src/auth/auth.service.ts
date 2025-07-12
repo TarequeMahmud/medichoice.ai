@@ -3,6 +3,7 @@ import { Users } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,5 +40,26 @@ export class AuthService {
     return {
       access_token,
     };
+  }
+
+  async register(
+    registerDto: CreateUserDto,
+  ): Promise<{ access_token: string }> {
+    const existingUser = await this.userService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new UnauthorizedException('User already exists');
+    }
+
+    const newUser = await this.userService.create(registerDto);
+
+    if (!newUser) {
+      throw new UnauthorizedException('Registration failed');
+    }
+    const loginDto: LoginDto = {
+      email: newUser.email,
+      password: registerDto.password,
+    };
+    const token = await this.login(loginDto);
+    return token;
   }
 }
