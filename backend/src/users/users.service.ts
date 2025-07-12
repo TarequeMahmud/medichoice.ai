@@ -14,9 +14,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
-    });
+    const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
@@ -47,12 +45,9 @@ export class UsersService {
     }
   }
 
-  async findByEmail(email: string): Promise<Users> {
+  async findByEmail(email: string): Promise<Users | null> {
     const user = await this.userRepository.findOne({ where: { email } });
 
-    if (!user) {
-      throw new NotFoundException(`User with email ${email} not found.`);
-    }
     return user;
   }
 
