@@ -29,7 +29,7 @@ export default async function Auth({
   }
   return (
     <html lang="en">
-      <body className={ibm.className}>
+      <body className={`${ibm.className} antialiased`}>
         <div className="flex flex-col md:flex-row justify-center items-center w-full mx-auto min-h-screen p-4">
           <div className="flex flex-col justify-center items-center md:w-[50%] w-full h-full px-10 gap-6">
             <Image
