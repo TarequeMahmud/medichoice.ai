@@ -4,13 +4,21 @@ import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { Keyv } from 'keyv';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
+  private keyv: Keyv;
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.keyv = new Keyv(configService.get('REDIS_URL'), {
+      ttl: 10 * 60 * 1000,
+    });
+  }
 
   async validateUser(
     email: string,
@@ -42,9 +50,7 @@ export class AuthService {
     };
   }
 
-  async register(
-    registerDto: CreateUserDto,
-  ): Promise<{ access_token: string }> {
+  async register(registerDto: CreateUserDto): Promise<string> {
     const existingUser = await this.userService.findByEmail(registerDto.email);
     if (existingUser) {
       throw new UnauthorizedException('User already exists');
@@ -52,14 +58,16 @@ export class AuthService {
 
     const newUser = await this.userService.create(registerDto);
 
-    if (!newUser) {
-      throw new UnauthorizedException('Registration failed');
-    }
-    const loginDto: LoginDto = {
-      email: newUser.email,
-      password: registerDto.password,
-    };
-    const token = await this.login(loginDto);
-    return token;
+    const otp = await this.generateOtp(newUser.email);
+    return otp;
+  }
+
+  async generateOtp(email: string): Promise<string> {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save OTP with TTL (e.g., 5 mins)
+    await this.keyv.set(`otp:${email}`, otp, 300);
+
+    return otp;
   }
 }

@@ -4,7 +4,6 @@ import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import generateCookie from 'src/common/utils/generateCookie';
-import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +23,7 @@ export class AuthController {
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = await this.authService.register(createUserDto);
-    return generateCookie(res, token.access_token);
+    const verificatioOtp = await this.authService.register(createUserDto);
+    return verificatioOtp;
   }
 }
