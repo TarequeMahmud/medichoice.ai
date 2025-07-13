@@ -12,6 +12,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import generateCookie from 'src/common/utils/generateCookie';
 import { UsersService } from 'src/users/users.service';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { sendOtp } from 'src/common/utils/sendOtp';
 
 @Controller('auth')
 export class AuthController {
@@ -30,12 +31,12 @@ export class AuthController {
   }
 
   @Post('/register')
-  async register(
-    @Body() createUserDto: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async register(@Body() createUserDto: CreateUserDto) {
     const verificatioOtp = await this.authService.register(createUserDto);
-    return verificatioOtp;
+    await sendOtp(createUserDto.email, verificatioOtp);
+    return {
+      message: 'User registered successfully. Please check your email for OTP.',
+    };
   }
 
   @Post('/verify-otp')
