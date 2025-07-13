@@ -23,8 +23,6 @@ export default function Login() {
       return;
     }
 
-    console.log(process.env.NEXT_PUBLIC_API_URL);
-    console.log(axiosInstance.defaults.baseURL);
     axiosInstance
       .post(`/auth/login`, { email, password })
       .then((response) => {
@@ -45,7 +43,6 @@ export default function Login() {
   };
   return (
     <AuthCard mode="login">
-      <h1 className="text-3xl font-bold my-4 text-white">Login</h1>
       <form
         className="flex flex-col justify-center gap-4 items-center w-full h-full"
         onSubmit={handleSignin}
