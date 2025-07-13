@@ -64,10 +64,27 @@ export class AuthService {
 
   async generateOtp(email: string): Promise<string> {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(email);
 
-    // Save OTP with TTL (e.g., 5 mins)
-    await this.keyv.set(`otp:${email}`, otp, 300);
+    const savedotp = await this.keyv.set(`otp:${email}`, otp, 5 * 60 * 1000);
+    console.log(savedotp);
 
     return otp;
+  }
+
+  async verifyOtp(email: string, otp: string): Promise<boolean> {
+    const storedOtp = await this.keyv.get<string>(`otp:${email}`);
+
+    console.log(`Stored OTP for ${email}: ${storedOtp}`);
+
+    if (!storedOtp) return false;
+
+    const isValid = storedOtp === otp;
+
+    if (isValid) {
+      await this.keyv.delete(`otp:${email}`);
+    }
+
+    return isValid;
   }
 }
