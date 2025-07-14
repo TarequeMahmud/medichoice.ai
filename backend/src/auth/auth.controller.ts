@@ -13,6 +13,8 @@ import generateCookie from 'src/common/utils/generateCookie';
 import { UsersService } from 'src/users/users.service';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { sendOtp } from 'src/common/utils/sendOtp';
+import { SearchEmailDto } from './dto/search-email.dto';
+import { ResetPassworDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -57,5 +59,25 @@ export class AuthController {
     });
 
     return generateCookie(res, token.access_token);
+  }
+
+  @Post('/change-password')
+  async changePassword(@Body() resetPasswordDto: ResetPassworDto) {
+    return this.authService.changePassword(resetPasswordDto);
+  }
+
+  @Post('/recovery')
+  async recovery(@Body() searchEmailDto: SearchEmailDto) {
+    return this.authService.recovery(searchEmailDto);
+  }
+
+  @Post('/logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access-token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+    return { message: 'Logged out successfully' };
   }
 }
