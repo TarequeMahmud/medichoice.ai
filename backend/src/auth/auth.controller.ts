@@ -70,4 +70,14 @@ export class AuthController {
   async recovery(@Body() searchEmailDto: SearchEmailDto) {
     return this.authService.recovery(searchEmailDto);
   }
+
+  @Post('/logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access-token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+    return { message: 'Logged out successfully' };
+  }
 }
