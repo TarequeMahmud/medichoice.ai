@@ -9,18 +9,19 @@ type AuthCardProps = {
 };
 
 const AuthCard = ({ children, mode, title }: AuthCardProps) => {
+  const authMode = mode === "register" || mode === "reset";
   return (
     <div
       className={clsx(
         "flex flex-col justify-center items-center w-full md:px-10",
-        mode === "register" && "md:w-[60%] h-auto min-h-full",
+        authMode && "md:w-[60%] h-auto min-h-full",
         mode === "login" && "md:w-[50%] h-full"
       )}
     >
       <div
         className={clsx(
           "flex flex-col justify-center items-center w-[97%] md:w-[600px]  h-auto px-5 md:px-10 bg-[#D9D9D952] rounded-xl shadow-lg my-10",
-          mode === "register" && "pb-4",
+          authMode && "pb-4",
           mode === "login" && "pb-8"
         )}
       >
