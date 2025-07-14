@@ -6,6 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Keyv } from 'keyv';
 import { ConfigService } from '@nestjs/config';
+import { SearchEmailDto } from './dto/search-email.dto';
+import { sendOtp } from 'src/common/utils/sendOtp';
+import { ResetPassworDto } from './dto/reset-password.dto';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -86,5 +90,41 @@ export class AuthService {
     }
 
     return isValid;
+  }
+
+  async recovery(searchEmailDto: SearchEmailDto): Promise<string> {
+    const { email } = searchEmailDto;
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const otp = await this.generateOtp(email);
+    console.log(`Sending OTP to ${email}: ${otp}`);
+    await sendOtp(email, otp);
+
+    return 'Recovery OTP sent to your email.';
+  }
+
+  async changePassword(resetPasswordDto: ResetPassworDto): Promise<string> {
+    const { email, otp, password } = resetPasswordDto;
+
+    const isValidOtp = await this.verifyOtp(email, otp);
+    if (!isValidOtp) {
+      throw new UnauthorizedException('Invalid OTP');
+    }
+
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    await this.userService.update(user.id as UUID, {
+      password,
+    });
+
+    const access_token = await this.login({ email, password });
+
+    return access_token.access_token;
   }
 }
