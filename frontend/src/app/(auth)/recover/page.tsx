@@ -1,5 +1,4 @@
 "use client";
-import axios from "axios";
 import { useState } from "react";
 import useLoader from "@/hooks/useLoader";
 import AuthCard from "@/components/AuthCard";
