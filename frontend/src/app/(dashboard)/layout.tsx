@@ -1,4 +1,5 @@
 import ClientLayout from "@/components/ClientLayout";
+import Sidebar from "@/components/Sidebar";
 import React from "react";
 
 interface LayoutProps {
@@ -7,7 +8,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="flex min-h-screen items-center justify-center w-full">
+    <div className="flex flex-row justify-start items-center min-h-screen w-full p-4">
+      <Sidebar />
       <ClientLayout>{children}</ClientLayout>
     </div>
   );

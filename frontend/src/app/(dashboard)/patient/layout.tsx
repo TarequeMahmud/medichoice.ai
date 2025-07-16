@@ -1,4 +1,3 @@
-import Sidebar from "@/components/Sidebar";
 import React from "react";
 
 interface PatientLayoutProps {
@@ -6,12 +5,7 @@ interface PatientLayoutProps {
 }
 
 const PatientLayout: React.FC<PatientLayoutProps> = ({ children }) => {
-  return (
-    <div className="flex flex-row justify-start items-center min-h-screen">
-      <Sidebar />
-      <main className="flex-1 p-6">{children}</main>
-    </div>
-  );
+  return <div className="p-6 w-[95%]">{children}</div>;
 };
 
 export default PatientLayout;

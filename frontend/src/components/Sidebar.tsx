@@ -2,10 +2,10 @@
 import React from "react";
 
 const sidebarImages = [
-  { src: "/ai.png", page: "/ai-suggestions" },
   { src: "/appointments.png", page: "/appointments" },
-  { src: "/messages.png", page: "/messages" },
+  { src: "/ai.png", page: "/ai-suggestions" },
   { src: "/records.png", page: "/records" },
+  { src: "/messages.png", page: "/messages" },
   { src: "/tips.png", page: "/tips" },
 ];
 
@@ -18,7 +18,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className="w-[50px] h-[40vh] flex flex-col items-center py-2 shadow-md rounded-lg"
+      className="w-[50px] h-[350px] flex flex-col justify-around items-center py-4 shadow-md rounded-lg"
       style={{ background: "rgba(217, 217, 217, 0.33)" }}
     >
       {sidebarImages.map((img, idx) => {
