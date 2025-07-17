@@ -5,6 +5,17 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+export const authorizedUser = async () => {
+  try {
+    const response = await axios.get("/api/me", {
+      withCredentials: true,
+    });
+    return response.data.user;
+  } catch (error) {
+    console.error("Error checking user validity:", error);
+    return false;
+  }
+};
 export const setupAxiosInterceptors = (
   showAlert: (msg: string, type?: "error" | "success") => void
 ) => {
