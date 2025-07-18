@@ -28,6 +28,12 @@ async function bootstrap() {
       },
       'access-token',
     )
+    .addCookieAuth('access-token', {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'access-token',
+      description: 'JWT access token stored in cookie',
+    })
     .addGlobalResponse({
       status: 500,
       description: 'Internal server error',
