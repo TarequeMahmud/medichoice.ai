@@ -19,7 +19,7 @@ export default async function Auth({
   console.log("token is:", token);
 
   if (token) {
-    redirect("/");
+    redirect(`/${token.role}`);
   }
   return (
     <div className="flex flex-col md:flex-row justify-center items-center w-full mx-auto min-h-screen p-4">
