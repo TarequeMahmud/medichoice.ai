@@ -33,6 +33,9 @@ export class AppointmentResponseDto {
   created_at: Date;
 
   @Expose()
+  clinic: string;
+
+  @Expose()
   updated_at: Date;
 
   @Expose()
