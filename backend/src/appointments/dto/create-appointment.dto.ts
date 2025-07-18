@@ -34,6 +34,15 @@ export class CreateAppointmentDto {
   })
   status?: AppointmentStatus;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    example: '123 Main St, Springfield',
+    description: 'Clinic address for the appointment',
+    required: false,
+  })
+  clinic?: string;
+
   @IsBoolean()
   @IsOptional()
   @ApiProperty({

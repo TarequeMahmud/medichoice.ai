@@ -40,6 +40,14 @@ export class Appointments {
   })
   scheduled_time: Date;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  @ApiProperty({
+    example: '123 Main St, Springfield',
+    description: 'Clinic address for the appointment',
+    required: false,
+  })
+  clinic: string;
+
   @Column({
     type: 'enum',
     enum: AppointmentStatus,
