@@ -18,7 +18,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className="w-[50px] h-[350px] flex flex-col justify-around items-center py-4 shadow-md rounded-lg"
+      className="fixed top-1/4 left-[40px] w-[50px] h-[350px] flex flex-col justify-around items-center py-4 shadow-md rounded-lg"
       style={{ background: "rgba(217, 217, 217, 0.33)" }}
     >
       {sidebarImages.map((img, idx) => {
