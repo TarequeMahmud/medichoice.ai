@@ -14,7 +14,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment }) => {
   };
 
   return (
-    <Card className="bg-[#D9D9D952] w-[60%] m-auto text-white">
+    <Card className="bg-[#D9D9D952] w-[60%] m-auto text-white mb-10">
       <CardTitle className="m-auto">
         Date: <em>20/20/2001</em>
       </CardTitle>
