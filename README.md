@@ -48,14 +48,14 @@ graph LR
         --> B[Validation & Sanitization]
         --> C[Authentication & Authorization]
         --> D[Medichoice.AI Backend - NestJS App]
-    D --> E[/users]
-    D --> F[/patients]
-    D --> G[/doctors]
-    D --> H[/appointments]
-    D --> I[/records]
-    D --> J[/ai]
-    D --> K[/tips]
-    D --> L[/messages]
+    D -- "/users" --> E[/users]
+    D -- "/patients" --> F[/patients]
+    D -- "/doctors" --> G[/doctors]
+    D -- "/appointments" --> H[/appointments]
+    D -- "/records" --> I[/records]
+    D -- "/ai" --> J[/ai]
+    D -- "/tips" --> K[/tips]
+    D -- "/messages" --> L[/messages]
 ```
 
 ---
