@@ -4,7 +4,6 @@ import AppointmentCard from "@/components/AppointmentCard";
 import Spinner from "@/components/Spinner";
 import useLoader from "@/hooks/useLoader";
 import { axiosInstance } from "@/lib/axios";
-import { axiosInstance } from "@/lib/axios";
 import { Appointment } from "@/types/appointment";
 import React, { useEffect, useState } from "react";
 
@@ -14,8 +13,6 @@ const Page: React.FC = () => {
   useEffect(() => {
     const checkUser = async () => {
       showLoader();
-  useEffect(() => {
-    const checkUser = async () => {
       const response = await axiosInstance.get("/patients/me/appointments", {
         withCredentials: true,
       });
