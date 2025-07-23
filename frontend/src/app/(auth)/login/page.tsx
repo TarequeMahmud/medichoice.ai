@@ -2,7 +2,7 @@
 import useLoader from "@/hooks/useLoader";
 import AuthCard from "@/components/AuthCard";
 import AuthButton from "@/components/AuthButton";
-import { axiosInstance } from "@/lib/axios";
+import { authorizedUser, axiosInstance } from "@/lib/axios";
 
 export default function Login() {
   const { loading, showLoader, hideLoader } = useLoader();
@@ -25,15 +25,12 @@ export default function Login() {
 
     axiosInstance
       .post(`/auth/login`, { email, password })
-      .then((response) => {
-        console.log(response);
+      .then(async (response) => {
         hideLoader();
-
         console.log(response.data);
-        if (response.status === 200) {
-          console.log(response.headers);
-
-          window.location.href = "/";
+        if (response.status === 201) {
+          const user = await authorizedUser();
+          window.location.href = `/${user.role}`;
         }
       })
       .catch((error) => {

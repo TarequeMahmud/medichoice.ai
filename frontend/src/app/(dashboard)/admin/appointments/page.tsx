@@ -3,16 +3,16 @@ import AppointmentCard from "@/components/AppointmentCard";
 import LoadingOrEmpty from "@/components/LoadingOrEmpty";
 import Section from "@/components/Section";
 import useAppointmentsWithRole from "@/hooks/useAppointmentsWithRole";
+
 import React from "react";
 
 const Page: React.FC = () => {
-  const { appointments, role, loading } = useAppointmentsWithRole(
-    "/patients/me/appointments"
-  );
+  const { appointments, role, loading } =
+    useAppointmentsWithRole("/appointments/");
 
   return (
-    <Section title="All Appointments">
-      {appointments.length > 0 ? (
+    <Section title="Appointments">
+      {appointments.length > 0 && role ? (
         appointments.map((appointment) => (
           <AppointmentCard
             key={appointment.id}

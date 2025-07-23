@@ -9,7 +9,11 @@ const sidebarImages = [
   { src: "/tips.png", page: "/tips" },
 ];
 
-const Sidebar: React.FC = () => {
+interface SideBarProps {
+  role: UserRole;
+}
+
+const Sidebar: React.FC<SideBarProps> = ({ role }) => {
   const handleNavigate = (page: string) => {
     window.location.href = page;
   };
@@ -28,7 +32,7 @@ const Sidebar: React.FC = () => {
             key={idx}
             onClick={() => {
               setActiveIdx(idx);
-              handleNavigate(`/patient/${img.page}`);
+              handleNavigate(`/${role}/${img.page}`);
             }}
             className="mb-3 last:mb-0 focus:outline-none rounded transition"
             type="button"

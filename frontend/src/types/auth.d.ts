@@ -4,6 +4,12 @@ declare namespace NodeJS {
   }
 }
 
+enum UserRole {
+  ADMIN = "admin",
+  DOCTOR = "doctor",
+  PATIENT = "patient",
+}
+
 interface AuthLinksProps {
   mode?: "login" | "register" | "reset";
 }

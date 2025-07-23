@@ -10,14 +10,12 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = async ({ children }) => {
   const isValidUser = await verifyToken();
-  console.log(isValidUser);
-
   if (!isValidUser) {
     redirect("/login");
   }
   return (
     <div className="flex flex-row justify-start items-center min-h-screen w-full p-4">
-      <Sidebar />
+      <Sidebar role={isValidUser.role} />
       <ClientLayout>{children}</ClientLayout>
     </div>
   );
