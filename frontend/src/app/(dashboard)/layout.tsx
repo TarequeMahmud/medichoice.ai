@@ -10,8 +10,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = async ({ children }) => {
   const isValidUser = await verifyToken();
-  console.log("user is ", isValidUser);
-
   if (!isValidUser) {
     redirect("/login");
   }

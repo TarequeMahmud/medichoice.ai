@@ -12,6 +12,7 @@ export type UserSummary = {
 
 type AppointmentCardProps = {
   appointment: Appointment;
+  role: UserRole | "";
 };
 
 export interface Appointment {
@@ -25,4 +26,11 @@ export interface Appointment {
   updated_at: string;
   patient: UserSummary;
   doctor: UserSummary;
+}
+
+interface AppointmentButtonAction {
+  label: string;
+  variant?: "default" | "destructive" | "outline" | null;
+  className?: string;
+  onClick?: () => void;
 }
