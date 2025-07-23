@@ -32,5 +32,5 @@ interface AppointmentButtonAction {
   label: string;
   variant?: "default" | "destructive" | "outline" | null;
   className?: string;
-  onClick?: () => void;
+  onClick?: () => Promise<void>;
 }

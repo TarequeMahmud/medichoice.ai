@@ -5,6 +5,8 @@ import {
   AppointmentButtonAction,
   AppointmentCardProps,
 } from "@/types/appointment";
+import { UUID } from "crypto";
+import { AppointmentActions } from "@/lib/actions";
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
   appointment,
@@ -20,8 +22,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     Location: appointment.clinic,
   };
 
-  const appointmentActions = getActionsByRole(role);
-  console.log("appointment actions: ", appointmentActions);
+  const appointmentActions = getActionsByRole(role, appointment.id);
 
   return (
     <Card className="bg-[#D9D9D952] w-[60%] m-auto text-white mb-10">
@@ -43,6 +44,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
               className={action.className}
               key={idx}
               variant={action.variant}
+              onClick={action.onClick}
             >
               {action.label}
             </Button>
@@ -53,13 +55,23 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 };
 
 const getActionsByRole = (
-  role: UserRole | ""
+  role: UserRole | "",
+  id: string
 ): AppointmentButtonAction[] | null => {
+  const actions = new AppointmentActions(id);
   switch (role) {
     case "admin":
       return [
-        { label: "Approve", className: "bg-green-800" },
-        { label: "Cancel", variant: "destructive" },
+        {
+          label: "Approve",
+          className: "bg-green-800",
+          onClick: () => actions.approve(),
+        },
+        {
+          label: "Decline",
+          variant: "destructive",
+          onClick: () => actions.decline(),
+        },
         { label: "View Details" },
       ];
     case "patient":
