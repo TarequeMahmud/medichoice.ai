@@ -6,11 +6,6 @@ import Section from "@/components/Section";
 import useAppointmentsWithRole from "@/hooks/useAppointmentsWithRole";
 import React from "react";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import CreateAppointment from "@/components/CreateAppointment";
 
 const Page: React.FC = () => {

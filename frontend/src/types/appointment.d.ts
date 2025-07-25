@@ -34,3 +34,8 @@ interface AppointmentButtonAction {
   className?: string;
   onClick?: () => Promise<void>;
 }
+
+interface AppointmentState {
+  appointments: Appointment[];
+  fetched: boolean;
+}
