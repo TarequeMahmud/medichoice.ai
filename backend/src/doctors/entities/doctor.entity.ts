@@ -63,6 +63,13 @@ export class Doctors {
 
   @Column()
   @ApiProperty({
+    example: 'Dr. John Doe',
+    description: "Doctor's full name (copied from user.name)",
+  })
+  name: string;
+
+  @Column()
+  @ApiProperty({
     example: '17:00',
     description: 'End time in HH:mm (24h format)',
   })
