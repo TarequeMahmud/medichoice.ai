@@ -39,6 +39,7 @@ export class DoctorsService {
     const newDoctorProfile = this.doctorRepository.create({
       ...createDoctorDto,
       id: userId,
+      name: user.full_name,
     });
     await this.doctorRepository.save(newDoctorProfile);
     return newDoctorProfile;
