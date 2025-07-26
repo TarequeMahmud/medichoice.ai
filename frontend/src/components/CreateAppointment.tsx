@@ -6,8 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useLoader from "@/hooks/useLoader";
 import { axiosInstance } from "@/lib/axios";
-
-const CreateAppointment: React.FC = () => {
+type CreateAppointmentProps = {
+  setShowModal: (value: boolean) => void;
+};
+const CreateAppointment: React.FC<CreateAppointmentProps> = ({
+  setShowModal,
+}) => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [fetched, setFetched] = useState(false);
   const { showLoader, hideLoader, loading } = useLoader();
@@ -143,7 +147,11 @@ const CreateAppointment: React.FC = () => {
               {/* Buttons */}
               <div className="flex gap-2 mt-4">
                 <Button type="submit">Create</Button>
-                <Button type="button" variant="outline">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowModal(false)}
+                >
                   Cancel
                 </Button>
               </div>

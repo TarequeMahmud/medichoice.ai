@@ -31,12 +31,12 @@ const Page: React.FC = () => {
         ))}
       <div
         className="fixed bottom-[50px] right-[50px] rounded-full w-20 h-20 bg-[rgba(114,1,99,0.3)] border-none text-2xl text-white flex items-center justify-center cursor-pointer z-10 transition-transform duration-200 ease-in-out hover:bg-[rgba(218,22,191,1)]"
-        onClick={() => setShowModal(true)}
+        onClick={() => setShowModal(!showModal)}
       >
         <MdOutlineCreate width={40} height={40} />
       </div>
 
-      {showModal && <CreateAppointment />}
+      {showModal && <CreateAppointment setShowModal={setShowModal} />}
     </Section>
   );
 };
