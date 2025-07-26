@@ -32,7 +32,7 @@ interface AppointmentButtonAction {
   label: string;
   variant?: "default" | "destructive" | "outline" | null;
   className?: string;
-  onClick?: () => Promise<void>;
+  onClick?: () => Promise<void> | void;
 }
 
 interface AppointmentState {
