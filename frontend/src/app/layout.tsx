@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
+import StoreProvider from "@/components/StoreProvider";
+import { AlertBar } from "@/components/AlertBar";
 
 const ibm = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -19,7 +21,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ibm.className} antialiased`}>{children}</body>
+      <StoreProvider>
+        <body className={`${ibm.className} antialiased`}>
+          <AlertBar />
+          {children}
+        </body>
+      </StoreProvider>
     </html>
   );
 }

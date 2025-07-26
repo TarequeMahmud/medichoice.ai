@@ -1,14 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import appointmentReducer from "./features/appointment/appointmentSlice";
+import alertReducer from "./features/alert/alertSlice";
 
-export const makeStore = () => {
-  return configureStore({
-    reducer: {
-      appointment: appointmentReducer,
-    },
-  });
-};
+export const store = configureStore({
+  reducer: {
+    appointment: appointmentReducer,
+    alert: alertReducer,
+  },
+});
 
-export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
-export type AppDispatch = AppStore["dispatch"];
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
