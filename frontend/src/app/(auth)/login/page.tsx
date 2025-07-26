@@ -3,41 +3,48 @@ import useLoader from "@/hooks/useLoader";
 import AuthCard from "@/components/AuthCard";
 import AuthButton from "@/components/AuthButton";
 import { authorizedUser, axiosInstance } from "@/lib/axios";
+import { useAppDispatch } from "@/hooks/redux";
+import { Alert, showAlert } from "@/lib/features/alert/alertSlice";
 
 export default function Login() {
   const { loading, showLoader, hideLoader } = useLoader();
-  const handleSignin = (event: React.FormEvent<HTMLFormElement>) => {
-    //prevent reload
+  const dispatch = useAppDispatch();
+  const handleSignin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    //show loader
     showLoader();
-    //form inputs
+
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email");
     const password = formData.get("password");
 
-    // Perform validation
     if (!email || !password) {
       alert("Please fill in all fields");
       hideLoader();
       return;
     }
 
-    axiosInstance
-      .post(`/auth/login`, { email, password })
-      .then(async (response) => {
-        hideLoader();
-        console.log(response.data);
-        if (response.status === 201) {
-          const user = await authorizedUser();
-          window.location.href = `/${user.role}`;
-        }
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-        hideLoader();
+    try {
+      const response = await axiosInstance.post(`/auth/login`, {
+        email,
+        password,
       });
+
+      if (response.status === 201) {
+        const user = await authorizedUser();
+        window.location.href = `/${user.role}`;
+      }
+    } catch (error: any) {
+      dispatch(
+        showAlert({
+          message: error.response?.data?.message || "Login failed",
+          type: "error",
+        } as Alert)
+      );
+    } finally {
+      hideLoader();
+    }
   };
+
   return (
     <AuthCard mode="login">
       <form
