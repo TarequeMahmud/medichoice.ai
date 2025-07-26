@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useLoader from "@/hooks/useLoader";
 import { axiosInstance } from "@/lib/axios";
+import { useAppDispatch } from "@/hooks/redux";
+import { addAppointment } from "@/lib/features/appointment/appointmentSlice";
 type CreateAppointmentProps = {
   setShowModal: (value: boolean) => void;
 };
@@ -15,6 +17,7 @@ const CreateAppointment: React.FC<CreateAppointmentProps> = ({
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [fetched, setFetched] = useState(false);
   const { showLoader, hideLoader, loading } = useLoader();
+  const dispatch = useAppDispatch();
 
   const fetchDoctors = async () => {
     if (fetched) return;
@@ -33,7 +36,6 @@ const CreateAppointment: React.FC<CreateAppointmentProps> = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-
     const date = formData.get("scheduled_date") as string;
     const time = formData.get("scheduled_time") as string;
     const combinedDateTime = new Date(`${date}T${time}:00Z`).toISOString();
@@ -47,6 +49,9 @@ const CreateAppointment: React.FC<CreateAppointmentProps> = ({
 
     try {
       const res = await axiosInstance.post("/appointments", payload);
+      dispatch(addAppointment(res.data));
+      setDoctors([]);
+      setShowModal(false);
       console.log("Appointment created:", res.data);
     } catch (error) {
       console.error("Failed to create appointment:", error);
