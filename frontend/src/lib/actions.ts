@@ -56,6 +56,12 @@ export class AppointmentActions {
       })
     );
   }
+
+  async markAsComplete() {
+    return await tryCatch(() =>
+      axiosInstance.patch(`/appointments/${this.appointmentId}/complete`)
+    );
+  }
 }
 
 export const getActionsByRole = (
@@ -126,6 +132,28 @@ export const getActionsByRole = (
 
     case "doctor":
       return [
+        {
+          label: "Mark As Complete",
+          className: "bg-green-800",
+          onClick: async () => {
+            const [res, err] = await actions.markAsComplete();
+            if (res) {
+              store.dispatch(
+                showAlert({
+                  message: "Appointment marked as completed",
+                  type: "success" as AlertType,
+                })
+              );
+            } else {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
+            }
+          },
+        },
         {
           label: "View Details",
           onClick: async () => {

@@ -51,7 +51,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
           {appointmentActions &&
             appointmentActions.map((action, idx) => (
               <Button
-                className={action.className}
+                className={`${action.className} cursor-pointer`}
                 key={idx}
                 variant={action.variant}
                 onClick={action.onClick}
@@ -69,6 +69,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
           onClose={() => {
             setViewDetails(false);
             setDoctor(null);
+            setPatient(null);
           }}
         />
       )}
