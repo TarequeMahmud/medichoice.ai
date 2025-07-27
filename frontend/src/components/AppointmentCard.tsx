@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { AppointmentCardProps } from "@/types/appointment";
-import { getActionsByRole } from "@/lib/actions";
+import { AppointmentActions, getActionsByRole } from "@/lib/actions";
 import AppointmentDetails from "./AppointmentDetails";
+import RescheduleAppointment from "./RescheduleAppointment";
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
   appointment,
@@ -11,6 +12,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 }) => {
   const [viewDetails, setViewDetails] = useState<boolean>(false);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [reschedule, setReschedule] = useState<boolean>(false);
   const appointmentsWithDetails = {
     Doctor: appointment.doctor.full_name,
     Time: new Date(appointment.scheduled_time).toLocaleTimeString(),
@@ -25,7 +27,8 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     role,
     appointment,
     setDoctor,
-    setViewDetails
+    setViewDetails,
+    setReschedule
   );
 
   return (
@@ -64,6 +67,15 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
             setViewDetails(false);
             setDoctor(null);
           }}
+        />
+      )}
+      {reschedule && (
+        <RescheduleAppointment
+          isOpen={reschedule}
+          onClose={() => setReschedule(false)}
+          onReschedule={(newtime: string) =>
+            new AppointmentActions(appointment).reschedule(newtime)
+          }
         />
       )}
     </>

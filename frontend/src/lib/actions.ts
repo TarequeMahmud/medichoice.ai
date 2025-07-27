@@ -42,13 +42,22 @@ export class AppointmentActions {
   async getAppointments() {
     return await tryCatch(() => axiosInstance.get("patients/me/appointments"));
   }
+
+  async reschedule(time: string) {
+    return await tryCatch(() =>
+      axiosInstance.patch(`/appointments/${this.appointmentId}/`, {
+        scheduled_time: time,
+      })
+    );
+  }
 }
 
 export const getActionsByRole = (
   role: UserRole | "",
   appointment: Appointment,
   setDoctor: React.Dispatch<React.SetStateAction<Doctor | null>>,
-  setViewDetails: React.Dispatch<React.SetStateAction<boolean>>
+  setViewDetails: React.Dispatch<React.SetStateAction<boolean>>,
+  setReschedule: React.Dispatch<React.SetStateAction<boolean>>
 ): AppointmentButtonAction[] | null => {
   const actions = new AppointmentActions(appointment);
   switch (role) {
@@ -68,7 +77,11 @@ export const getActionsByRole = (
       ];
     case "patient":
       return [
-        { label: "Reschedule", className: "bg-green-800" },
+        {
+          label: "Reschedule",
+          className: "bg-green-800",
+          onClick: () => setReschedule(true),
+        },
         {
           label: "Delete",
           variant: "destructive",
