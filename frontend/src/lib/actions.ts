@@ -18,7 +18,7 @@ export class AppointmentActions {
     this.appointmentId = appointment.id;
   }
   async approve() {
-    await tryCatch(() =>
+    return await tryCatch(() =>
       axiosInstance.patch(`/appointments/${this.appointmentId}/approve`)
     );
   }
@@ -79,7 +79,24 @@ export const getActionsByRole = (
         {
           label: "Approve",
           className: "bg-green-800",
-          onClick: () => actions.approve(),
+          onClick: async () => {
+            const [res, err] = await actions.approve();
+            if (res) {
+              store.dispatch(
+                showAlert({
+                  message: "Appointment approved",
+                  type: "success" as AlertType,
+                })
+              );
+            } else {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
+            }
+          },
         },
         {
           label: "Decline",
@@ -103,7 +120,18 @@ export const getActionsByRole = (
             }
           },
         },
-        { label: "View Details", onClick: () => setViewDetails(true) },
+        {
+          label: "View Details",
+          onClick: async () => {
+            const [doctorRes, patientRes] = await Promise.all([
+              actions.doctorInfo().then(([res]) => res),
+              actions.patientInfo().then(([res]) => res),
+            ]);
+            setDoctor(doctorRes?.data);
+            setPatient(patientRes?.data);
+            setViewDetails(true);
+          },
+        },
       ];
     case "patient":
       return [
