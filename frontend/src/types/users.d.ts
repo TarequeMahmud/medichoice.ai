@@ -13,3 +13,21 @@ type Doctor = {
   created_at: string;
   updated_at: string;
 };
+
+interface Patient {
+  blood_type: string;
+  emergency_contact: string;
+  emergency_contact_name: string;
+  emergency_contact_relation: string;
+  address: string;
+  date_of_birth: string; // ISO format, e.g. '1990-01-01'
+  gender: "male" | "female" | "other";
+  height_cm: number;
+  weight_kg: number;
+  known_allergies: string[];
+  chronic_conditions: string[];
+  medications: string[];
+  medical_history: string;
+  insurance_provider: string;
+  insurance_number: string;
+}

@@ -12,6 +12,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 }) => {
   const [viewDetails, setViewDetails] = useState<boolean>(false);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [patient, setPatient] = useState<Patient | null>(null);
   const [reschedule, setReschedule] = useState<boolean>(false);
   const appointmentsWithDetails = {
     Doctor: appointment.doctor.full_name,
@@ -27,6 +28,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     role,
     appointment,
     setDoctor,
+    setPatient,
     setViewDetails,
     setReschedule
   );
@@ -49,7 +51,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
           {appointmentActions &&
             appointmentActions.map((action, idx) => (
               <Button
-                className={action.className}
+                className={`${action.className} cursor-pointer`}
                 key={idx}
                 variant={action.variant}
                 onClick={action.onClick}
@@ -59,17 +61,19 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
             ))}
         </CardFooter>
       </Card>
-      {viewDetails && (
+      {viewDetails && !reschedule && (
         <AppointmentDetails
           appointment={appointment}
-          doctor={doctor!}
+          doctor={doctor}
+          patient={patient}
           onClose={() => {
             setViewDetails(false);
             setDoctor(null);
+            setPatient(null);
           }}
         />
       )}
-      {reschedule && (
+      {reschedule && !viewDetails && (
         <RescheduleAppointment
           isOpen={reschedule}
           onClose={() => setReschedule(false)}

@@ -56,7 +56,7 @@ export class AppointmentsService {
   }
 
   async findAllByDoctorId(doctorId: UUID): Promise<AppointmentResponseDto[]> {
-    return await this.findAppointments({ id: doctorId }, true);
+    return await this.findAppointments({ doctor: { id: doctorId } }, true);
   }
 
   async findAllByPatientId(patientId: UUID): Promise<AppointmentResponseDto[]> {
