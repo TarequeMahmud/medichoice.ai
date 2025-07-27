@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
-import {
-  Appointment,
-  AppointmentButtonAction,
-  AppointmentCardProps,
-} from "@/types/appointment";
-import { AppointmentActions } from "@/lib/actions";
+import { AppointmentCardProps } from "@/types/appointment";
+import { AppointmentActions, getActionsByRole } from "@/lib/actions";
 import AppointmentDetails from "./AppointmentDetails";
+import RescheduleAppointment from "./RescheduleAppointment";
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
   appointment,
@@ -15,6 +12,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 }) => {
   const [viewDetails, setViewDetails] = useState<boolean>(false);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [reschedule, setReschedule] = useState<boolean>(false);
   const appointmentsWithDetails = {
     Doctor: appointment.doctor.full_name,
     Time: new Date(appointment.scheduled_time).toLocaleTimeString(),
@@ -29,7 +27,8 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     role,
     appointment,
     setDoctor,
-    setViewDetails
+    setViewDetails,
+    setReschedule
   );
 
   return (
@@ -70,48 +69,17 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
           }}
         />
       )}
+      {reschedule && (
+        <RescheduleAppointment
+          isOpen={reschedule}
+          onClose={() => setReschedule(false)}
+          onReschedule={(newtime: string) =>
+            new AppointmentActions(appointment).reschedule(newtime)
+          }
+        />
+      )}
     </>
   );
-};
-
-const getActionsByRole = (
-  role: UserRole | "",
-  appointment: Appointment,
-  setDoctor: React.Dispatch<React.SetStateAction<Doctor | null>>,
-  setViewDetails: React.Dispatch<React.SetStateAction<boolean>>
-): AppointmentButtonAction[] | null => {
-  const actions = new AppointmentActions(appointment);
-  switch (role) {
-    case "admin":
-      return [
-        {
-          label: "Approve",
-          className: "bg-green-800",
-          onClick: () => actions.approve(),
-        },
-        {
-          label: "Decline",
-          variant: "destructive",
-          onClick: () => actions.decline(),
-        },
-        { label: "View Details", onClick: () => setViewDetails(true) },
-      ];
-    case "patient":
-      return [
-        { label: "Reschedule", className: "bg-green-800" },
-        { label: "Cancel", variant: "destructive" },
-        {
-          label: "View Details",
-          onClick: async () => {
-            const [res] = await actions.doctorInfo();
-            setDoctor(res?.data);
-            setViewDetails(true);
-          },
-        },
-      ];
-    default:
-      return null;
-  }
 };
 
 export default AppointmentCard;
