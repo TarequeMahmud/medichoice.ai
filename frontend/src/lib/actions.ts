@@ -33,6 +33,12 @@ export class AppointmentActions {
     return await tryCatch(() => axiosInstance.get(`/doctors/${this.doctorId}`));
   }
 
+  async patientInfo() {
+    return await tryCatch(() =>
+      axiosInstance.get(`/patients/${this.patientId}`)
+    );
+  }
+
   async delete() {
     return await tryCatch(() =>
       axiosInstance.delete(`/appointments/${this.appointmentId}`)
@@ -56,6 +62,7 @@ export const getActionsByRole = (
   role: UserRole | "",
   appointment: Appointment,
   setDoctor: React.Dispatch<React.SetStateAction<Doctor | null>>,
+  setPatient: React.Dispatch<React.SetStateAction<Patient | null>>,
   setViewDetails: React.Dispatch<React.SetStateAction<boolean>>,
   setReschedule: React.Dispatch<React.SetStateAction<boolean>>
 ): AppointmentButtonAction[] | null => {
@@ -116,6 +123,19 @@ export const getActionsByRole = (
           },
         },
       ];
+
+    case "doctor":
+      return [
+        {
+          label: "View Details",
+          onClick: async () => {
+            const [res] = await actions.patientInfo();
+            setPatient(res?.data);
+            setViewDetails(true);
+          },
+        },
+      ];
+
     default:
       return null;
   }
