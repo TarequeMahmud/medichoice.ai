@@ -24,7 +24,7 @@ export class AppointmentActions {
   }
 
   async decline() {
-    await tryCatch(() =>
+    return await tryCatch(() =>
       axiosInstance.patch(`/appointments/${this.appointmentId}/decline`)
     );
   }
@@ -84,7 +84,24 @@ export const getActionsByRole = (
         {
           label: "Decline",
           variant: "destructive",
-          onClick: () => actions.decline(),
+          onClick: async () => {
+            const [res, err] = await actions.decline();
+            if (res) {
+              store.dispatch(
+                showAlert({
+                  message: "Appointment successfuly declined",
+                  type: "success" as AlertType,
+                })
+              );
+            } else {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
+            }
+          },
         },
         { label: "View Details", onClick: () => setViewDetails(true) },
       ];
@@ -154,6 +171,29 @@ export const getActionsByRole = (
             }
           },
         },
+        {
+          label: "Decline",
+          variant: "destructive",
+          onClick: async () => {
+            const [res, err] = await actions.decline();
+            if (res) {
+              store.dispatch(
+                showAlert({
+                  message: "Appointment successfuly declined",
+                  type: "success" as AlertType,
+                })
+              );
+            } else {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
+            }
+          },
+        },
+
         {
           label: "View Details",
           onClick: async () => {
