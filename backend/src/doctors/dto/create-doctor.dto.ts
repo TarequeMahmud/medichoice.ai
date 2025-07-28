@@ -14,6 +14,7 @@ import {
   IsBoolean,
   Matches,
 } from 'class-validator';
+import { Column } from 'typeorm';
 
 export class CreateDoctorDto {
   @ApiProperty({
@@ -97,4 +98,13 @@ export class CreateDoctorDto {
   @IsOptional()
   @IsBoolean()
   is_verified?: boolean;
+
+  @Column()
+  @ApiProperty({
+    example: 'Dr. John Doe',
+    description: "Doctor's full name (copied from user.name)",
+  })
+  @IsString()
+  @IsOptional()
+  name: string;
 }
