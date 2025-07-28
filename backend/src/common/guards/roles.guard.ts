@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
+import { AuthenticatedRequest, JwtPayload } from '../types/auth';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -15,8 +16,8 @@ export class RolesGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
     if (!requiredRules) return true;
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    const request: AuthenticatedRequest = context.switchToHttp().getRequest();
+    const user: JwtPayload = request.user;
     return requiredRules.includes(user.role);
   }
 }

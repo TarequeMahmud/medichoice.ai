@@ -13,7 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET_KEY'),
         signOptions: { expiresIn: '1d' },
       }),

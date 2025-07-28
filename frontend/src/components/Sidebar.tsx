@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React from "react";
 
 const sidebarImages = [
@@ -52,7 +53,7 @@ const Sidebar: React.FC<SideBarProps> = ({ role }) => {
                   : undefined
               }
             >
-              <img
+              <Image
                 src={img.src}
                 alt={`Sidebar icon ${idx + 1}`}
                 className="w-8 h-8 object-contain"

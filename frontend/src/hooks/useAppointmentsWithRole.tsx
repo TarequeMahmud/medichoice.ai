@@ -24,7 +24,7 @@ export default function useAppointmentsWithRole(url: string) {
       hideLoader();
     };
     if (!fetched) checkUser();
-  }, [url]);
+  }, [url, dispatch, fetched, showLoader, hideLoader]);
 
   return { appointments, role, loading };
 }

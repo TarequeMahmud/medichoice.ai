@@ -3,7 +3,7 @@ import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserRole } from 'src/users/entities/user.entity';
 
 export function EmailField() {
-  return function (target: any, propertyKey: string) {
+  return function (target: object, propertyKey: string) {
     ApiProperty({
       description: 'Email address of the user',
       example: 'john.doe@example.com',
@@ -14,7 +14,7 @@ export function EmailField() {
 }
 
 export function PasswordField() {
-  return function (target: any, propertyKey: string) {
+  return function (target: object, propertyKey: string) {
     ApiProperty({
       description: 'Password for the user account',
       minLength: 6,
@@ -29,7 +29,7 @@ export function PasswordField() {
 }
 
 export function OtpField() {
-  return function (target: any, propertyKey: string) {
+  return function (target: object, propertyKey: string) {
     ApiProperty({
       description: 'One-time password for verification',
       minLength: 6,
@@ -44,7 +44,7 @@ export function OtpField() {
 }
 
 export function FullNameField() {
-  return function (target: any, propertyKey: string) {
+  return function (target: object, propertyKey: string) {
     ApiProperty({
       description: 'Full name of the user',
       minLength: 6,
@@ -59,7 +59,7 @@ export function FullNameField() {
 }
 
 export function RoleField() {
-  return function (target: any, propertyKey: string) {
+  return function (target: object, propertyKey: string) {
     ApiProperty({
       description: 'Role of the user',
       enum: UserRole,

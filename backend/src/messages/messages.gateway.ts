@@ -1,4 +1,4 @@
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -9,11 +9,12 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { MessagesService } from './messages.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from 'src/users/entities/user.entity';
+import { AuthenticatedSocket, JwtPayload } from 'src/common/types/auth';
 
 @WebSocketGateway()
 export class MessagesGateway
@@ -27,12 +28,12 @@ export class MessagesGateway
     private jwtService: JwtService,
   ) {}
 
-  afterInit(server: Server) {
+  afterInit() {
     this.logger.log('message socket initialised');
   }
 
-  handleConnection(client: Socket) {
-    const token = client.handshake.auth.token;
+  handleConnection(client: AuthenticatedSocket) {
+    const token: string = client.handshake.auth.token as string;
 
     if (!token) {
       client.disconnect();
@@ -40,7 +41,7 @@ export class MessagesGateway
     }
 
     try {
-      const payload = this.jwtService.verify(token);
+      const payload: JwtPayload = this.jwtService.verify(token);
       if (![UserRole.DOCTOR, UserRole.PATIENT].includes(payload.role)) {
         client.emit('auth error:', { message: 'Forbidden role' });
         client.disconnect(true);
@@ -49,32 +50,33 @@ export class MessagesGateway
       }
       client.data.user = payload;
       console.log(payload);
-    } catch (error) {
+    } catch (error: unknown) {
       client.disconnect();
-      console.warn('Connection rejected: Invalid token');
+      console.warn('Connection rejected: Invalid token:', error);
     }
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect(client: AuthenticatedSocket) {
     this.logger.log(`Client disconnected: ${client.data.user.email}`);
   }
 
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(
     @MessageBody() data: { receiverId: string },
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     let room: string;
     const sender = client.data.user;
     console.log('the reciever is: ', data.receiverId);
+    const senderRole: UserRole = sender.role;
 
-    if (sender.role === 'doctor') {
+    if (senderRole === UserRole.DOCTOR) {
       room = `room-${sender.sub}-${data.receiverId}`;
     } else {
       room = `room-${data.receiverId}-${sender.sub}`;
     }
 
-    client.join(room);
+    await client.join(room);
     client.data.room = room;
     this.logger.log('joined room: ', room);
     const getPreviousMessage = await this.messagesService.findByRoom(room);
@@ -91,7 +93,7 @@ export class MessagesGateway
 
   @SubscribeMessage('sendMessage')
   async handleMessage(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody()
     data: SendMessageDto,
   ): Promise<void> {

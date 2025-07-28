@@ -1,4 +1,3 @@
-import { title } from "process";
 import React, { PropsWithChildren } from "react";
 
 interface SectionProps extends PropsWithChildren {

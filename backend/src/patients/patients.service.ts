@@ -73,17 +73,13 @@ export class PatientsService {
     id: UUID,
     updatePatientDto: UpdatePatientDto,
   ): Promise<Patients | null> {
-    try {
-      const patient = await this.findOne(id);
-      if (!patient) {
-        return null;
-      }
-      Object.assign(patient, updatePatientDto);
-      const updatedPatient = await this.patientRepository.save(patient);
-      return updatedPatient;
-    } catch (error: unknown) {
-      throw error;
+    const patient = await this.findOne(id);
+    if (!patient) {
+      return null;
     }
+    Object.assign(patient, updatePatientDto);
+    const updatedPatient = await this.patientRepository.save(patient);
+    return updatedPatient;
   }
 
   async remove(id: UUID): Promise<boolean> {

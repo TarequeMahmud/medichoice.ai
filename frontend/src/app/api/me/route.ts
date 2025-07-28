@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     const user = jwt.verify(token, process.env.JWT_SECRET!);
     return NextResponse.json({ user });
   } catch (err) {
+    console.log(err);
     return NextResponse.json({ user: null }, { status: 401 });
   }
 }

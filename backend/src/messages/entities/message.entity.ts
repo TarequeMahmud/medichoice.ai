@@ -7,7 +7,6 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { Users } from 'src/users/entities/user.entity';
-import { Appointments } from 'src/appointments/entities/appointment.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('messages')

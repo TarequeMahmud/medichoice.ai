@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Tips } from './entities/tip.entity';
 import { UsersService } from 'src/users/users.service';
 import { UUID } from 'crypto';
+import { UserRole } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class TipsService {
@@ -15,7 +16,8 @@ export class TipsService {
   ) {}
   async create(adminId: UUID, createTipDto: CreateTipDto) {
     const user = await this.userService.findOne(adminId);
-    if (!user || user.role !== 'admin')
+    const userRole: UserRole = user.role;
+    if (!user || userRole !== UserRole.ADMIN)
       throw new UnauthorizedException('You are not authorized.');
     const tip = this.tipRepository.create(createTipDto);
     return await this.tipRepository.save(tip);
@@ -40,7 +42,8 @@ export class TipsService {
 
   async update(id: UUID, adminId: UUID, updateTipDto: UpdateTipDto) {
     const user = await this.userService.findOne(adminId);
-    if (!user || user.role !== 'admin')
+    const userRole: UserRole = user.role;
+    if (!user || userRole !== UserRole.ADMIN)
       throw new UnauthorizedException('You are not authorized.');
     await this.tipRepository.update(id, updateTipDto);
     return await this.tipRepository.findOne({ where: { id } });

@@ -7,11 +7,23 @@ export interface JwtPayload {
 }
 
 import { Request } from 'express';
+import { Socket } from 'socket.io';
 import { UserRole } from 'src/users/entities/user.entity';
 
 export interface RequestWithUser extends Request {
   user: {
     userId: UUID;
     email: string;
+  };
+}
+
+export interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
+
+export interface AuthenticatedSocket extends Socket {
+  data: {
+    user: JwtPayload;
+    room: string;
   };
 }

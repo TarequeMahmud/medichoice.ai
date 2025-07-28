@@ -4,6 +4,7 @@ import { Appointment, AppointmentButtonAction } from "@/types/appointment";
 import { store } from "@/lib/store";
 import { AlertType, showAlert } from "@/lib/features/alert/alertSlice";
 import { addAppointmentArray } from "@/lib/features/appointment/appointmentSlice";
+import { AxiosError } from "axios";
 
 export class AppointmentActions {
   appointment: Appointment;
@@ -89,12 +90,14 @@ export const getActionsByRole = (
                 })
               );
             } else {
-              store.dispatch(
-                showAlert({
-                  message: err.response?.data?.message,
-                  type: "error" as AlertType,
-                })
-              );
+              if (err && err instanceof AxiosError) {
+                store.dispatch(
+                  showAlert({
+                    message: err.response?.data?.message,
+                    type: "error" as AlertType,
+                  })
+                );
+              }
             }
           },
         },
@@ -111,12 +114,14 @@ export const getActionsByRole = (
                 })
               );
             } else {
-              store.dispatch(
-                showAlert({
-                  message: err.response?.data?.message,
-                  type: "error" as AlertType,
-                })
-              );
+              if (err && err instanceof AxiosError) {
+                store.dispatch(
+                  showAlert({
+                    message: err.response?.data?.message,
+                    type: "error" as AlertType,
+                  })
+                );
+              }
             }
           },
         },
@@ -146,7 +151,7 @@ export const getActionsByRole = (
           onClick: async () => {
             const [res, err] = await actions.delete();
             if (res) {
-              const [res, err] = await actions.getAppointments();
+              const [res] = await actions.getAppointments();
 
               store.dispatch(addAppointmentArray(res!.data));
               store.dispatch(
@@ -156,12 +161,14 @@ export const getActionsByRole = (
                 })
               );
             } else {
-              store.dispatch(
-                showAlert({
-                  message: err.response?.data?.message,
-                  type: "error" as AlertType,
-                })
-              );
+              if (err && err instanceof AxiosError) {
+                store.dispatch(
+                  showAlert({
+                    message: err.response?.data?.message,
+                    type: "error" as AlertType,
+                  })
+                );
+              }
             }
           },
         },
@@ -190,12 +197,14 @@ export const getActionsByRole = (
                 })
               );
             } else {
-              store.dispatch(
-                showAlert({
-                  message: err.response?.data?.message,
-                  type: "error" as AlertType,
-                })
-              );
+              if (err && err instanceof AxiosError) {
+                store.dispatch(
+                  showAlert({
+                    message: err.response?.data?.message,
+                    type: "error" as AlertType,
+                  })
+                );
+              }
             }
           },
         },
@@ -212,12 +221,14 @@ export const getActionsByRole = (
                 })
               );
             } else {
-              store.dispatch(
-                showAlert({
-                  message: err.response?.data?.message,
-                  type: "error" as AlertType,
-                })
-              );
+              if (err && err instanceof AxiosError) {
+                store.dispatch(
+                  showAlert({
+                    message: err.response?.data?.message,
+                    type: "error" as AlertType,
+                  })
+                );
+              }
             }
           },
         },
