@@ -35,11 +35,15 @@ export class DoctorsService {
     if (isExists) {
       throw new ConflictException('Doctor profile already exists');
     }
+    const doctorName = createDoctorDto.name || user.full_name;
+    if (!doctorName) {
+      throw new ConflictException('Doctor name is required');
+    }
 
     const newDoctorProfile = this.doctorRepository.create({
       ...createDoctorDto,
       id: userId,
-      name: user.full_name,
+      name: doctorName,
     });
     await this.doctorRepository.save(newDoctorProfile);
     return newDoctorProfile;
