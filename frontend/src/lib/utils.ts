@@ -7,12 +7,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function tryCatch<T>(
   fn: () => Promise<T>
-): Promise<[T | null, any]> {
+): Promise<[T | null, Error | null]> {
   try {
     const result = await fn();
     return [result, null];
   } catch (error) {
-    console.log("Error with the request: ", error);
-    return [null, error];
+    console.log("Axios error: ", error);
+    return [null, error as Error];
   }
 }

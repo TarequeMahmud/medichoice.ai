@@ -10,7 +10,6 @@ import { Repository } from 'typeorm';
 import { Doctors } from './entities/doctor.entity';
 import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
-import { rethrowIfError } from 'src/common/utils/rethrowIfError';
 import { AppointmentsService } from 'src/appointments/appointments.service';
 
 @Injectable()
@@ -71,17 +70,13 @@ export class DoctorsService {
     id: UUID,
     updateDoctorDto: UpdateDoctorDto,
   ): Promise<Doctors | null> {
-    try {
-      const doctor = await this.findOne(id);
-      if (!doctor) {
-        return null;
-      }
-      Object.assign(doctor, updateDoctorDto);
-      const updatedDoctor = await this.doctorRepository.save(doctor);
-      return updatedDoctor;
-    } catch (error: unknown) {
-      throw rethrowIfError;
+    const doctor = await this.findOne(id);
+    if (!doctor) {
+      return null;
     }
+    Object.assign(doctor, updateDoctorDto);
+    const updatedDoctor = await this.doctorRepository.save(doctor);
+    return updatedDoctor;
   }
 
   async remove(id: UUID): Promise<boolean> {

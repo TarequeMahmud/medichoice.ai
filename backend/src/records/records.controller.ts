@@ -32,7 +32,7 @@ export class RecordsController {
     @Body() createRecordDto: CreateRecordDto,
     @Req() req: RequestWithUser,
   ) {
-    const userId = req.user.userId as UUID;
+    const userId = req.user.userId;
     return this.recordsService.create(userId, createRecordDto);
   }
 
@@ -55,7 +55,7 @@ export class RecordsController {
     @Body() updateRecordDto: UpdateRecordDto,
     @Req() req: RequestWithUser,
   ) {
-    const userId = req.user.userId as UUID;
+    const userId = req.user.userId;
     return this.recordsService.update(id, userId, updateRecordDto);
   }
   @Roles(UserRole.DOCTOR)

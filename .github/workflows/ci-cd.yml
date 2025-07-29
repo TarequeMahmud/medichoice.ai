@@ -1,45 +1,68 @@
-name: CI/CD for Medichoice.Ai deployment(currently backend)
+name: CI/CD for Medichoice.Ai deployment (Backend + Frontend)
 
 on:
   push:
     branches: [main]
     paths:
       - "backend/**"
+      - "frontend/**"
       - ".github/workflows/ci-cd.yml"
   pull_request:
     branches: [main]
     paths:
       - "backend/**"
+      - "frontend/**"
       - ".github/workflows/ci-cd.yml"
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      - name: Install dependencies
+      # Backend
+      - name: Install Backend Dependencies
         run: npm install
         working-directory: ./backend
 
-      # - name: Lint
-      #   run: npm run lint
-      #   working-directory: ./backend
+      - name: Lint Backend
+        run: npm run lint
+        working-directory: ./backend
 
-      # - name: Build NestJS backend API
-      #   run: npm run build
-      #   working-directory: ./backend
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: |
-      github.ref == 'refs/heads/main' &&
-      contains(github.event.head_commit.message, '#deploy')
-    steps:
-      - name: Trigger and deploy
-        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      - name: Build Backend
+        run: npm run build
+        working-directory: ./backend
+
+      # Frontend
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Lint Frontend
+        run: npm run lint
+        working-directory: ./frontend
+
+      - name: Build Frontend
+        run: npm run build
+        working-directory: ./frontend
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: |
+  #     github.ref == 'refs/heads/main' &&
+  #     contains(github.event.head_commit.message, '#deploy')
+  #   steps:
+  #     - name: Deploy Backend to Render
+  #       run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+  #     - name: Deploy Frontend to Vercel
+  #       run: curl -X POST https://api.vercel.com/v1/integrations/deploy/prj_<PROJECT_ID>/XXXXXXXXXXXXXXXXXXXXXXXX
+  #       env:
+  #         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

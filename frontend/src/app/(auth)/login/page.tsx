@@ -5,6 +5,7 @@ import AuthButton from "@/components/AuthButton";
 import { authorizedUser, axiosInstance } from "@/lib/axios";
 import { useAppDispatch } from "@/hooks/redux";
 import { Alert, showAlert } from "@/lib/features/alert/alertSlice";
+import axios from "axios";
 
 export default function Login() {
   const { loading, showLoader, hideLoader } = useLoader();
@@ -33,13 +34,15 @@ export default function Login() {
         const user = await authorizedUser();
         window.location.href = `/${user.role}`;
       }
-    } catch (error: any) {
-      dispatch(
-        showAlert({
-          message: error.response?.data?.message || "Login failed",
-          type: "error",
-        } as Alert)
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        dispatch(
+          showAlert({
+            message: error.response?.data?.message || "Login failed",
+            type: "error",
+          } as Alert)
+        );
+      }
     } finally {
       hideLoader();
     }

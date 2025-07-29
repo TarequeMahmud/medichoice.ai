@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import React from "react";
 
 const ErrorPage: React.FC = () => {
@@ -8,12 +9,12 @@ const ErrorPage: React.FC = () => {
       <p className="text-xl mb-8">
         Something went wrong. Please try again later.
       </p>
-      <a
+      <Link
         href="/"
         className="px-6 py-3 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition"
       >
         Go Home
-      </a>
+      </Link>
     </div>
   );
 };

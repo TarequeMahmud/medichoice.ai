@@ -2,10 +2,11 @@ import { Inject, Injectable, ForbiddenException } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { Repository } from 'typeorm';
-import { Record, Records } from './entities/record.entity';
+import { Record } from './entities/record.entity';
 import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
 import { AppointmentsService } from 'src/appointments/appointments.service';
+import { UserRole } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class RecordsService {
@@ -24,10 +25,11 @@ export class RecordsService {
       this.userService.findOne(doctorId),
       this.appointmentService.findOne(appointmentId as UUID),
     ]);
+    const doctorRole: UserRole = doctor.role;
 
     if (
       !doctor ||
-      doctor.role !== 'doctor' ||
+      doctorRole !== UserRole.DOCTOR ||
       !appointment ||
       appointment.doctor.id !== doctor.id
     ) {
@@ -96,7 +98,9 @@ export class RecordsService {
       this.recordRepository.findOne({ where: { id }, relations: ['doctor'] }),
     ]);
 
-    if (!doctor || doctor.role !== 'doctor') {
+    const doctorRole: UserRole = doctor.role;
+
+    if (!doctor || doctorRole !== UserRole.DOCTOR) {
       throw new ForbiddenException(
         'You are not authorized to update this record.',
       );

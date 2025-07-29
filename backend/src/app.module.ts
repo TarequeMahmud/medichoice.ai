@@ -10,7 +10,6 @@ import { RecordsModule } from './records/records.module';
 import { MessagesModule } from './messages/messages.module';
 import { TipsModule } from './tips/tips.module';
 
-
 @Module({
   imports: [
     AuthModule,
@@ -23,7 +22,6 @@ import { TipsModule } from './tips/tips.module';
     RecordsModule,
     MessagesModule,
     TipsModule,
-
   ],
 })
 export class AppModule {}
