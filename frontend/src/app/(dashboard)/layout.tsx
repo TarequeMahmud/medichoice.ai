@@ -3,10 +3,16 @@ import Sidebar from "@/components/Sidebar";
 import React from "react";
 import { verifyToken } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
+
+export const metadata: Metadata = {
+  title: "Medichoice.AI",
+  description: "Medichoice.AI main page",
+};
 
 const Layout: React.FC<LayoutProps> = async ({ children }) => {
   const isValidUser = await verifyToken();

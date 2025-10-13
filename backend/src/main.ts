@@ -49,7 +49,7 @@ async function bootstrap() {
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/doc', app, documentFactory);
+  SwaggerModule.setup('api/docs', app, documentFactory);
 
   app.enableCors({
     origin: process.env.FRONTEND_URL,

@@ -6,8 +6,8 @@ import { redirect } from "next/navigation";
 import ClientLayout from "@/components/ClientLayout";
 
 export const metadata: Metadata = {
-  title: "Vox- Authenticate",
-  description: "Vox authentication page",
+  title: "Medichoice.AI- Authenticate",
+  description: "Medichoice.AI authentication page",
 };
 
 export default async function Auth({

@@ -75,6 +75,8 @@ export default function Register() {
     }
   };
 
+  const inputStyle = "w-full md:h-[50px] border-2 border-gray-300 rounded-md p-2 m-2"
+
   return (
     <AuthCard
       mode="register"
@@ -91,14 +93,14 @@ export default function Register() {
               placeholder="Full Name"
               name="name"
               required
-              className="w-full md:h-[50px] border-2 border-gray-300 rounded-md p-2 m-2"
+              className={inputStyle}
             />
             <input
               type="email"
               placeholder="Email"
               name="email"
               required
-              className="w-full md:h-[50px] border-2 border-gray-300 rounded-md p-2 m-2"
+              className={inputStyle}
             />
             <input
               type="password"
@@ -110,22 +112,24 @@ export default function Register() {
               autoComplete="on"
               autoCorrect="off"
               spellCheck="false"
-              className="w-full md:h-[50px] border-2 border-gray-300 rounded-md p-2 m-2"
+              className={inputStyle}
             />
             <select
               name="role"
               required
-              className="w-full md:h-[50px] border-2 border-gray-300 rounded-md p-2 m-2"
+              defaultValue=""
+              className={inputStyle}
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Select Role
               </option>
               <option value="patient">Patient</option>
               <option value="doctor">Doctor</option>
             </select>
+
             <div className="flex items-center w-full m-2">
               <input type="checkbox" name="terms" required className="mr-2" />
-              <label htmlFor="terms" className="text-sm">
+              <label htmlFor="terms" className="text-sm text-white">
                 I agree to the terms and conditions
               </label>
             </div>
@@ -137,7 +141,7 @@ export default function Register() {
             placeholder="Enter Verification Code"
             name="verificationCode"
             required
-            className="w-full md:h-[50px] border-2 border-gray-300 rounded-md p-2 m-2"
+            className={inputStyle}
           />
         )}
 

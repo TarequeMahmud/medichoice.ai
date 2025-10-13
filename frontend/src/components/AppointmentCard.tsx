@@ -35,7 +35,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
   return (
     <>
-      <Card className="bg-[#D9D9D952] w-[60%] m-auto text-white mb-10">
+      <Card className="bg-[#05050580] w-[60%] m-auto text-white mb-10">
         <CardTitle className="m-auto">
           Date: <em>{appointmentsWithDetails.Date}</em>
         </CardTitle>

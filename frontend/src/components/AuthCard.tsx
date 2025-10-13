@@ -20,7 +20,7 @@ const AuthCard = ({ children, mode, title }: AuthCardProps) => {
     >
       <div
         className={clsx(
-          "flex flex-col justify-center items-center w-[97%] md:w-[600px]  h-auto px-5 md:px-10 bg-[#D9D9D952] rounded-xl shadow-lg my-10",
+          "flex flex-col justify-center items-center w-[97%] md:w-[600px]  h-auto px-5 md:px-10 bg-[#000000ad] rounded-xl shadow-lg my-10",
           authMode && "pb-4",
           mode === "login" && "pb-8"
         )}

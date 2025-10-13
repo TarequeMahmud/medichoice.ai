@@ -7,7 +7,7 @@ const AuthLinks: React.FC<AuthLinksProps> = ({ mode }) => {
       {(mode === "login" || mode === "reset") && (
         <p className="md:text-lg text-center text-white">
           Don&apos;t have an account?{" "}
-          <a href="/auth/register" className="text-amber-400">
+          <a href="/register" className="text-amber-400">
             Register
           </a>
         </p>
@@ -16,7 +16,7 @@ const AuthLinks: React.FC<AuthLinksProps> = ({ mode }) => {
       {(mode === "register" || mode === "reset") && (
         <p className="md:text-lg text-center text-white">
           Have an account?{" "}
-          <a href="/auth/login" className="text-amber-400">
+          <a href="/login" className="text-amber-400">
             Login instead
           </a>
         </p>
@@ -25,7 +25,7 @@ const AuthLinks: React.FC<AuthLinksProps> = ({ mode }) => {
       {(mode === "login" || mode === "register") && (
         <p className="md:text-lg text-center text-white">
           Forgot your password?{" "}
-          <a href="/auth/recover" className="text-amber-400">
+          <a href="/recover" className="text-amber-400">
             Reset Password
           </a>
         </p>

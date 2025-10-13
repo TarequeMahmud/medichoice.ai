@@ -43,19 +43,21 @@ const Sidebar: React.FC<SideBarProps> = ({ role }) => {
               style={
                 isActive
                   ? {
-                      background: "rgba(0,0,0,0.3)",
-                      borderRadius: "8px",
-                      padding: "6px",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }
+                    background: "rgba(0,0,0,0.3)",
+                    borderRadius: "8px",
+                    padding: "6px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }
                   : undefined
               }
             >
               <Image
                 src={img.src}
                 alt={`Sidebar icon ${idx + 1}`}
+                width={32}
+                height={32}
                 className="w-8 h-8 object-contain"
               />
             </div>
