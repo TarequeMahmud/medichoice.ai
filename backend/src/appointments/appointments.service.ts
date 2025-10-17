@@ -20,7 +20,7 @@ export class AppointmentsService {
     @Inject('APPOINTMENT_REPOSITORY')
     private appointmentRepository: Repository<Appointments>,
     private userService: UsersService,
-  ) {}
+  ) { }
 
   async create(
     patientId: UUID,
@@ -53,6 +53,10 @@ export class AppointmentsService {
 
   async findOne(id: UUID): Promise<AppointmentResponseDto | null> {
     return await this.findAppointments({ id }, false);
+  }
+
+  async getFullAppointment(id: UUID): Promise<Appointments | null> {
+    return await this.appointmentRepository.findOne({ where: { id }, relations: ['doctor', 'patient'] })
   }
 
   async findAllByDoctorId(doctorId: UUID): Promise<AppointmentResponseDto[]> {

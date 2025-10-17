@@ -12,4 +12,4 @@ import { AppointmentsModule } from 'src/appointments/appointments.module';
   providers: [...recordProviders, RecordsService],
   exports: [RecordsService],
 })
-export class RecordsModule {}
+export class RecordsModule { }

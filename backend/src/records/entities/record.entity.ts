@@ -46,12 +46,13 @@ export class Records {
   })
   description: string;
 
-  @Column('text')
+  @Column('text', { array: true })
   @ApiProperty({
-    example: 'Paracetamol 500mg, twice a day',
-    description: 'Prescription issued by the doctor',
+    example: ['Paracetamol 500mg, twice a day'],
+    description: 'List of prescriptions issued by the doctor',
+    type: [String],
   })
-  prescription: string;
+  prescription: string[];
 
   @Column('text', { array: true, nullable: true })
   @ApiProperty({
@@ -70,5 +71,3 @@ export class Records {
   @ApiProperty({ description: 'Updated at timestamp' })
   updated_at: Date;
 }
-
-export class Record {}
