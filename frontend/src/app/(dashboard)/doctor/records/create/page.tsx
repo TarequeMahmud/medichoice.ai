@@ -6,19 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-// import { axiosInstance } from "@/lib/axios";
+import { axiosInstance } from "@/lib/axios";
 import useLoader from "@/hooks/useLoader";
-// import { AlertType, showAlert } from "@/lib/features/alert/alertSlice";
-// import { useAppDispatch } from "@/hooks/redux";
+import { AlertType, showAlert } from "@/lib/features/alert/alertSlice";
+import { useAppDispatch } from "@/hooks/redux";
 
 const CreateRecordPage: React.FC = () => {
-    // const searchParams = useSearchParams();
+    const searchParams = useSearchParams();
     const router = useRouter();
-    // const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
     const { showLoader, hideLoader, loading } = useLoader();
 
-    // const appointmentId = searchParams.get("appointmentId");
-    // const patientId = searchParams.get("patientId");
+    const appointmentId = searchParams.get("appointmentId");
+    const patientId = searchParams.get("patientId");
 
     const [title, setTitle] = useState("Follow-up Consultation");
     const [description, setDescription] = useState("");
@@ -46,59 +46,59 @@ const CreateRecordPage: React.FC = () => {
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        return
-        // e.preventDefault();
+        e.preventDefault();
 
-        // if (!appointmentId || !patientId) {
-        //     dispatch(
-        //         showAlert({
-        //             message: "Missing patientId or appointmentId in URL.",
-        //             type: AlertType.Error,
-        //         })
-        //     );
-        //     return;
-        // }
+        if (!appointmentId || !patientId) {
+            dispatch(
+                showAlert({
+                    message: "Missing patientId or appointmentId in URL.",
+                    type: AlertType.Error,
+                })
+            );
+            return;
+        }
 
-        // const payload = {
-        //     patientId,
-        //     appointmentId,
-        //     title,
-        //     description,
-        //     prescription: prescriptions.filter((p) => p.trim() !== ""),
-        //     attachments: attachments.filter((a) => a.trim() !== ""),
-        // };
+        const payload = {
+            patientId,
+            appointmentId,
+            title,
+            description,
+            prescription: prescriptions.filter((p) => p.trim() !== ""),
+            attachments: attachments.filter((a) => a.trim() !== ""),
+        };
 
-        // showLoader();
-        // try {
-        //     const res = await axiosInstance.post("/records", payload);
-        //     dispatch(
-        //         showAlert({
-        //             message: "Record created successfully",
-        //             type: AlertType.Success,
-        //         })
-        //     );
-        //     router.push(`/doctor/records/${res.data.id}`);
-        // } catch (error) {
-        //     console.error("Failed to create record:", error);
-        //     dispatch(
-        //         showAlert({
-        //             message: "Failed to create record. Please try again.",
-        //             type: AlertType.Error,
-        //         })
-        //     );
-        // } finally {
-        //     hideLoader();
-        // }
+        showLoader();
+        try {
+            const res = await axiosInstance.post("/records", payload);
+            dispatch(
+                showAlert({
+                    message: "Record created successfully",
+                    type: AlertType.Success,
+                })
+            );
+            router.push(`/doctor/records/${res.data.id}`);
+        } catch (error) {
+            console.error("Failed to create record:", error);
+            dispatch(
+                showAlert({
+                    message: "Failed to create record. Please try again.",
+                    type: AlertType.Error,
+                })
+            );
+        } finally {
+            hideLoader();
+        }
     };
 
-    const inputClass = "text-white placeholder:text-[#fdfdfd9c]"
+    const inputClass = "text-white placeholder:text-[#fdfdfd9c] mt-2"
+    const labelClass = "text-white font-semibold"
 
     return (
         <div className="container flex items-center justify-center py-10">
             <div className="w-full md:w-[60%]">
                 <Card className="bg-[#D9D9D952] border-none shadow-lg rounded-[25px]">
                     <CardHeader>
-                        <CardTitle className="text-3xl text-white">
+                        <CardTitle className="text-3xl text-center text-white">
                             Create Patient Record
                         </CardTitle>
                     </CardHeader>
@@ -106,7 +106,7 @@ const CreateRecordPage: React.FC = () => {
                         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                             {/* Title */}
                             <div>
-                                <Label htmlFor="title">Title</Label>
+                                <Label htmlFor="title" className={labelClass}>Title</Label>
                                 <Input
                                     id="title"
                                     name="title"
@@ -114,12 +114,13 @@ const CreateRecordPage: React.FC = () => {
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="Follow-up Consultation"
                                     required
+                                    className={inputClass}
                                 />
                             </div>
 
                             {/* Description */}
                             <div>
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description" className={labelClass}>Description</Label>
                                 <Textarea
                                     id="description"
                                     name="description"
@@ -133,7 +134,7 @@ const CreateRecordPage: React.FC = () => {
 
                             {/* Prescription Array */}
                             <div>
-                                <Label>Prescriptions</Label>
+                                <Label className={labelClass}>Prescriptions</Label>
                                 {prescriptions.map((item, index) => (
                                     <div key={index} className="flex gap-2 mt-2">
                                         <Input
@@ -164,7 +165,7 @@ const CreateRecordPage: React.FC = () => {
 
                             {/* Attachments */}
                             <div>
-                                <Label>Attachments (URLs)</Label>
+                                <Label className={labelClass}>Attachments (URLs)</Label>
                                 {attachments.map((item, index) => (
                                     <div key={index} className="flex gap-2 mt-2">
                                         <Input

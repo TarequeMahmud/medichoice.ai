@@ -8,7 +8,7 @@ import React from "react";
 
 const Page: React.FC = () => {
   const { appointments, role, loading } = useAppointmentsWithRole(
-    "/doctors/appointments/"
+    "/doctors/me/appointments/"
   );
 
   return (
