@@ -7,7 +7,7 @@ interface RescheduleAppointmentProps {
   isOpen: boolean;
   onReschedule: (
     newtime: string
-  ) => Promise<[AxiosResponse | null, AxiosResponse | null]>;
+  ) => Promise<[AxiosResponse | null, Error | null]>;
   onClose: () => void;
 }
 const RescheduleAppointment: React.FC<RescheduleAppointmentProps> = ({

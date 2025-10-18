@@ -21,7 +21,7 @@ export class DoctorsService {
     private userService: UsersService,
     private appointmentService: AppointmentsService,
     private readonly recordService: RecordsService,
-  ) { }
+  ) {}
 
   async create(
     userId: UUID,

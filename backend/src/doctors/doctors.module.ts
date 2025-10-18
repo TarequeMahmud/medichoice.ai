@@ -13,4 +13,4 @@ import { RecordsModule } from 'src/records/records.module';
   providers: [...doctorProviders, DoctorsService],
   exports: [DoctorsService],
 })
-export class DoctorsModule { }
+export class DoctorsModule {}

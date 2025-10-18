@@ -1,4 +1,9 @@
-import { Inject, Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { Repository } from 'typeorm';
@@ -7,6 +12,7 @@ import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
 import { AppointmentsService } from 'src/appointments/appointments.service';
 import { UserRole } from 'src/users/entities/user.entity';
+import { AppointmentStatus } from 'src/appointments/entities/appointment.entity';
 
 @Injectable()
 export class RecordsService {
@@ -15,13 +21,15 @@ export class RecordsService {
     private recordRepository: Repository<Records>,
     private userService: UsersService,
     private appointmentService: AppointmentsService,
-  ) { }
+  ) {}
 
   async create(doctorId: UUID, createRecordDto: CreateRecordDto) {
     const { patientId, appointmentId } = createRecordDto;
 
     if (!appointmentId) {
-      throw new ForbiddenException('Appointment ID is required to create a record.');
+      throw new ForbiddenException(
+        'Appointment ID is required to create a record.',
+      );
     }
 
     const [patient, doctor, appointment] = await Promise.all([
@@ -32,7 +40,9 @@ export class RecordsService {
     console.log(appointment);
 
     if (!doctor || doctor.role !== UserRole.DOCTOR) {
-      throw new ForbiddenException('You are not authorized to create a record.');
+      throw new ForbiddenException(
+        'You are not authorized to create a record.',
+      );
     }
 
     if (!appointment) {
@@ -40,14 +50,16 @@ export class RecordsService {
     }
 
     if (appointment.doctor.id !== doctor.id) {
-      throw new ForbiddenException('You are not the doctor of this appointment.');
+      throw new ForbiddenException(
+        'You are not the doctor of this appointment.',
+      );
     }
 
     if (!appointment.admin_approved) {
       throw new ForbiddenException('Appointment not approved by admin.');
     }
 
-    if (appointment.status !== 'completed') {
+    if (appointment.status !== AppointmentStatus.COMPLETED) {
       throw new ForbiddenException(
         'Appointment must be completed before creating a record.',
       );
@@ -69,7 +81,6 @@ export class RecordsService {
 
     return this.recordRepository.save(record);
   }
-
 
   async findAll() {
     return this.recordRepository.find({
@@ -103,7 +114,11 @@ export class RecordsService {
     return record;
   }
 
-  async update(id: UUID, doctorId: UUID, updateRecordDto: UpdateRecordDto): Promise<Records> {
+  async update(
+    id: UUID,
+    doctorId: UUID,
+    updateRecordDto: UpdateRecordDto,
+  ): Promise<Records> {
     const [doctor, record] = await Promise.all([
       this.userService.findOne(doctorId),
       this.recordRepository.findOne({ where: { id }, relations: ['doctor'] }),
@@ -113,8 +128,14 @@ export class RecordsService {
       throw new NotFoundException(`Record with id ${id} not found.`);
     }
 
-    if (!doctor || doctor.role !== UserRole.DOCTOR || doctor.id !== record.doctor.id) {
-      throw new ForbiddenException('You are not authorized to update this record.');
+    if (
+      !doctor ||
+      doctor.role !== UserRole.DOCTOR ||
+      doctor.id !== record.doctor.id
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to update this record.',
+      );
     }
 
     Object.assign(record, updateRecordDto);

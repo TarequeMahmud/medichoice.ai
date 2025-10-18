@@ -23,7 +23,7 @@ import { RequestWithUser } from 'src/common/types/auth';
 @ApiBearerAuth('access-token')
 @Controller('doctors')
 export class DoctorsController {
-  constructor(private readonly doctorsService: DoctorsService) { }
+  constructor(private readonly doctorsService: DoctorsService) {}
 
   @Roles(UserRole.DOCTOR)
   @Post()
@@ -60,8 +60,6 @@ export class DoctorsController {
   findOne(@Param('id') id: UUID) {
     return this.doctorsService.findOne(id);
   }
-
-
 
   @Roles(UserRole.DOCTOR)
   @Patch(':id')

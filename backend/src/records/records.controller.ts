@@ -17,7 +17,12 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RecordResponseDto } from './dto/record-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { UUID } from 'crypto';
@@ -27,7 +32,7 @@ import { UUID } from 'crypto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('records')
 export class RecordsController {
-  constructor(private readonly recordsService: RecordsService) { }
+  constructor(private readonly recordsService: RecordsService) {}
 
   // CREATE RECORD
   @Post()
@@ -40,7 +45,9 @@ export class RecordsController {
   ): Promise<RecordResponseDto> {
     const userId = req.user.userId;
     const record = await this.recordsService.create(userId, createRecordDto);
-    return plainToInstance(RecordResponseDto, record, { excludeExtraneousValues: true });
+    return plainToInstance(RecordResponseDto, record, {
+      excludeExtraneousValues: true,
+    });
   }
 
   // FIND ALL RECORDS
@@ -50,7 +57,9 @@ export class RecordsController {
   @ApiResponse({ status: 200, type: [RecordResponseDto] })
   async findAll(): Promise<RecordResponseDto[]> {
     const records = await this.recordsService.findAll();
-    return plainToInstance(RecordResponseDto, records, { excludeExtraneousValues: true });
+    return plainToInstance(RecordResponseDto, records, {
+      excludeExtraneousValues: true,
+    });
   }
 
   // FIND SINGLE RECORD
@@ -60,7 +69,9 @@ export class RecordsController {
   @ApiResponse({ status: 200, type: RecordResponseDto })
   async findOne(@Param('id') id: UUID): Promise<RecordResponseDto> {
     const record = await this.recordsService.findOne(id);
-    return plainToInstance(RecordResponseDto, record, { excludeExtraneousValues: true });
+    return plainToInstance(RecordResponseDto, record, {
+      excludeExtraneousValues: true,
+    });
   }
 
   // UPDATE RECORD
@@ -74,8 +85,14 @@ export class RecordsController {
     @Req() req: RequestWithUser,
   ): Promise<RecordResponseDto> {
     const userId = req.user.userId;
-    const updated = await this.recordsService.update(id, userId, updateRecordDto);
-    return plainToInstance(RecordResponseDto, updated, { excludeExtraneousValues: true });
+    const updated = await this.recordsService.update(
+      id,
+      userId,
+      updateRecordDto,
+    );
+    return plainToInstance(RecordResponseDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 
   // DELETE RECORD

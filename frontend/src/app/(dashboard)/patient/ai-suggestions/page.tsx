@@ -5,7 +5,7 @@ import Spinner from "@/components/Spinner";
 import Section from "@/components/Section";
 import { axiosInstance } from "@/lib/axios";
 
-const AISuggestionPage: React.FC = () => {
+const Page: React.FC = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,9 +20,14 @@ const AISuggestionPage: React.FC = () => {
         search_prompt: prompt,
       });
       setResponse(res.data.response);
-    } catch (err: any) {
-      console.error("Error:", err.message);
-      setResponse("❌ Failed to fetch AI suggestion.");
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error:", err.message);
+        setResponse("Failed to fetch AI suggestion.");
+      } else {
+        console.error("Unknown error:", err);
+        setResponse("Failed to fetch AI suggestion.");
+      }
     } finally {
       setLoading(false);
     }
@@ -106,4 +111,4 @@ const AISuggestionPage: React.FC = () => {
   );
 };
 
-export default AISuggestionPage;
+export default Page;

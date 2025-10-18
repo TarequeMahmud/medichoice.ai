@@ -4,36 +4,36 @@ import { AppointmentResponseDto } from 'src/appointments/dto/appointment-respons
 
 @Exclude()
 export class RecordResponseDto {
-    @Expose()
-    id: string;
+  @Expose()
+  id: string;
 
-    @Expose()
-    title: string;
+  @Expose()
+  title: string;
 
-    @Expose()
-    description: string;
+  @Expose()
+  description: string;
 
-    @Expose()
-    prescription: string[];
+  @Expose()
+  prescription: string[];
 
-    @Expose()
-    attachments?: string[];
+  @Expose()
+  attachments?: string[];
 
-    @Expose()
-    created_at: Date;
+  @Expose()
+  created_at: Date;
 
-    @Expose()
-    updated_at: Date;
+  @Expose()
+  updated_at: Date;
 
-    @Expose()
-    @Type(() => MinimalUserDto)
-    patient: MinimalUserDto;
+  @Expose()
+  @Type(() => MinimalUserDto)
+  patient: MinimalUserDto;
 
-    @Expose()
-    @Type(() => MinimalUserDto)
-    doctor: MinimalUserDto;
+  @Expose()
+  @Type(() => MinimalUserDto)
+  doctor: MinimalUserDto;
 
-    @Expose()
-    @Type(() => AppointmentResponseDto)
-    appointment: AppointmentResponseDto;
+  @Expose()
+  @Type(() => AppointmentResponseDto)
+  appointment: AppointmentResponseDto;
 }
