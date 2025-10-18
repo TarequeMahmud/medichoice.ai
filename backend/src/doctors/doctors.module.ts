@@ -5,11 +5,12 @@ import { DatabaseModule } from 'src/database/database.module';
 import { doctorProviders } from './doctors.providers';
 import { UsersModule } from 'src/users/users.module';
 import { AppointmentsModule } from 'src/appointments/appointments.module';
+import { RecordsModule } from 'src/records/records.module';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, AppointmentsModule],
+  imports: [DatabaseModule, UsersModule, AppointmentsModule, RecordsModule],
   controllers: [DoctorsController],
   providers: [...doctorProviders, DoctorsService],
   exports: [DoctorsService],
 })
-export class DoctorsModule {}
+export class DoctorsModule { }

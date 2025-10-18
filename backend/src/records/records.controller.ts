@@ -13,54 +13,77 @@ import { RecordsService } from './records.service';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { RequestWithUser } from 'src/common/types/auth';
-import { UUID } from 'crypto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RecordResponseDto } from './dto/record-response.dto';
+import { plainToInstance } from 'class-transformer';
+import { UUID } from 'crypto';
 
+@ApiTags('Records')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('records')
-@ApiBearerAuth('access-token')
 export class RecordsController {
-  constructor(private readonly recordsService: RecordsService) {}
+  constructor(private readonly recordsService: RecordsService) { }
 
+  // CREATE RECORD
   @Post()
   @Roles(UserRole.DOCTOR)
-  create(
+  @ApiOperation({ summary: 'Create a new medical record (Doctor only)' })
+  @ApiResponse({ status: 201, type: RecordResponseDto })
+  async create(
     @Body() createRecordDto: CreateRecordDto,
     @Req() req: RequestWithUser,
-  ) {
+  ): Promise<RecordResponseDto> {
     const userId = req.user.userId;
-    return this.recordsService.create(userId, createRecordDto);
+    const record = await this.recordsService.create(userId, createRecordDto);
+    return plainToInstance(RecordResponseDto, record, { excludeExtraneousValues: true });
   }
 
-  @Roles(UserRole.ADMIN)
+  // FIND ALL RECORDS
   @Get()
-  findAll() {
-    return this.recordsService.findAll();
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Retrieve all medical records (Admin only)' })
+  @ApiResponse({ status: 200, type: [RecordResponseDto] })
+  async findAll(): Promise<RecordResponseDto[]> {
+    const records = await this.recordsService.findAll();
+    return plainToInstance(RecordResponseDto, records, { excludeExtraneousValues: true });
   }
 
-  @Roles(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT)
+  // FIND SINGLE RECORD
   @Get(':id')
-  findOne(@Param('id') id: UUID) {
-    return this.recordsService.findOne(id);
+  @Roles(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT)
+  @ApiOperation({ summary: 'Retrieve a specific medical record by ID' })
+  @ApiResponse({ status: 200, type: RecordResponseDto })
+  async findOne(@Param('id') id: UUID): Promise<RecordResponseDto> {
+    const record = await this.recordsService.findOne(id);
+    return plainToInstance(RecordResponseDto, record, { excludeExtraneousValues: true });
   }
 
-  @Roles(UserRole.DOCTOR)
+  // UPDATE RECORD
   @Patch(':id')
-  update(
+  @Roles(UserRole.DOCTOR)
+  @ApiOperation({ summary: 'Update an existing medical record (Doctor only)' })
+  @ApiResponse({ status: 200, type: RecordResponseDto })
+  async update(
     @Param('id') id: UUID,
     @Body() updateRecordDto: UpdateRecordDto,
     @Req() req: RequestWithUser,
-  ) {
+  ): Promise<RecordResponseDto> {
     const userId = req.user.userId;
-    return this.recordsService.update(id, userId, updateRecordDto);
+    const updated = await this.recordsService.update(id, userId, updateRecordDto);
+    return plainToInstance(RecordResponseDto, updated, { excludeExtraneousValues: true });
   }
-  @Roles(UserRole.DOCTOR)
+
+  // DELETE RECORD
   @Delete(':id')
-  remove(@Param('id') id: UUID) {
-    return this.recordsService.remove(id);
+  @Roles(UserRole.DOCTOR)
+  @ApiOperation({ summary: 'Delete a medical record (Doctor only)' })
+  @ApiResponse({ status: 204, description: 'Record deleted successfully' })
+  async remove(@Param('id') id: UUID): Promise<void> {
+    await this.recordsService.remove(id);
   }
 }

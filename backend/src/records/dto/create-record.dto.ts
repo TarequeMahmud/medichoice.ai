@@ -26,11 +26,13 @@ export class CreateRecordDto {
   description: string;
 
   @ApiProperty({
-    example: 'Paracetamol 500mg, twice a day',
-    description: 'Prescription issued by the doctor',
+    example: ['Paracetamol 500mg, twice a day'],
+    description: 'List of prescriptions issued by the doctor',
+    type: [String],
   })
-  @IsString()
-  prescription: string;
+  @IsArray()
+  @IsString({ each: true })
+  prescription: string[];
 
   @ApiPropertyOptional({
     example: ['https://cdn.medichoice.ai/reports/lab1.pdf'],

@@ -74,6 +74,7 @@ export const getActionsByRole = (
   setReschedule: React.Dispatch<React.SetStateAction<boolean>>
 ): AppointmentButtonAction[] | null => {
   const actions = new AppointmentActions(appointment);
+
   switch (role) {
     case "admin":
       return [
@@ -89,15 +90,13 @@ export const getActionsByRole = (
                   type: "success" as AlertType,
                 })
               );
-            } else {
-              if (err && err instanceof AxiosError) {
-                store.dispatch(
-                  showAlert({
-                    message: err.response?.data?.message,
-                    type: "error" as AlertType,
-                  })
-                );
-              }
+            } else if (err instanceof AxiosError) {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
             }
           },
         },
@@ -109,19 +108,17 @@ export const getActionsByRole = (
             if (res) {
               store.dispatch(
                 showAlert({
-                  message: "Appointment successfuly declined",
+                  message: "Appointment successfully declined",
                   type: "success" as AlertType,
                 })
               );
-            } else {
-              if (err && err instanceof AxiosError) {
-                store.dispatch(
-                  showAlert({
-                    message: err.response?.data?.message,
-                    type: "error" as AlertType,
-                  })
-                );
-              }
+            } else if (err instanceof AxiosError) {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
             }
           },
         },
@@ -138,6 +135,7 @@ export const getActionsByRole = (
           },
         },
       ];
+
     case "patient":
       return [
         {
@@ -151,24 +149,21 @@ export const getActionsByRole = (
           onClick: async () => {
             const [res, err] = await actions.delete();
             if (res) {
-              const [res] = await actions.getAppointments();
-
-              store.dispatch(addAppointmentArray(res!.data));
+              const [listRes] = await actions.getAppointments();
+              store.dispatch(addAppointmentArray(listRes!.data));
               store.dispatch(
                 showAlert({
                   message: "Deleted successfully",
                   type: "success" as AlertType,
                 })
               );
-            } else {
-              if (err && err instanceof AxiosError) {
-                store.dispatch(
-                  showAlert({
-                    message: err.response?.data?.message,
-                    type: "error" as AlertType,
-                  })
-                );
-              }
+            } else if (err instanceof AxiosError) {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
             }
           },
         },
@@ -182,9 +177,52 @@ export const getActionsByRole = (
         },
       ];
 
-    case "doctor":
-      return [
+    case "doctor": {
+      const isCompleted = appointment.status === "completed";
+
+      const baseActions: AppointmentButtonAction[] = [
         {
+          label: "Decline",
+          variant: "destructive",
+          onClick: async () => {
+            const [res, err] = await actions.decline();
+            if (res) {
+              store.dispatch(
+                showAlert({
+                  message: "Appointment successfully declined",
+                  type: "success" as AlertType,
+                })
+              );
+            } else if (err instanceof AxiosError) {
+              store.dispatch(
+                showAlert({
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
+                })
+              );
+            }
+          },
+        },
+        {
+          label: "View Details",
+          onClick: async () => {
+            const [res] = await actions.patientInfo();
+            setPatient(res?.data);
+            setViewDetails(true);
+          },
+        },
+      ];
+
+      // Conditional button
+      const statusAction: AppointmentButtonAction = isCompleted
+        ? {
+          label: "Create Record",
+          className: "bg-blue-700",
+          onClick: () => {
+            window.location.href = `/doctor/records/create?patientId=${appointment.patient.id}&appointmentId=${appointment.id}`;
+          },
+        }
+        : {
           label: "Mark As Complete",
           className: "bg-green-800",
           onClick: async () => {
@@ -196,54 +234,22 @@ export const getActionsByRole = (
                   type: "success" as AlertType,
                 })
               );
-            } else {
-              if (err && err instanceof AxiosError) {
-                store.dispatch(
-                  showAlert({
-                    message: err.response?.data?.message,
-                    type: "error" as AlertType,
-                  })
-                );
-              }
-            }
-          },
-        },
-        {
-          label: "Decline",
-          variant: "destructive",
-          onClick: async () => {
-            const [res, err] = await actions.decline();
-            if (res) {
+            } else if (err instanceof AxiosError) {
               store.dispatch(
                 showAlert({
-                  message: "Appointment successfuly declined",
-                  type: "success" as AlertType,
+                  message: err.response?.data?.message,
+                  type: "error" as AlertType,
                 })
               );
-            } else {
-              if (err && err instanceof AxiosError) {
-                store.dispatch(
-                  showAlert({
-                    message: err.response?.data?.message,
-                    type: "error" as AlertType,
-                  })
-                );
-              }
             }
           },
-        },
+        };
 
-        {
-          label: "View Details",
-          onClick: async () => {
-            const [res] = await actions.patientInfo();
-            setPatient(res?.data);
-            setViewDetails(true);
-          },
-        },
-      ];
+      return [statusAction, ...baseActions];
+    }
 
     default:
       return null;
   }
 };
+

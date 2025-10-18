@@ -11,6 +11,7 @@ import { Doctors } from './entities/doctor.entity';
 import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
 import { AppointmentsService } from 'src/appointments/appointments.service';
+import { RecordsService } from 'src/records/records.service';
 
 @Injectable()
 export class DoctorsService {
@@ -19,7 +20,8 @@ export class DoctorsService {
     private doctorRepository: Repository<Doctors>,
     private userService: UsersService,
     private appointmentService: AppointmentsService,
-  ) {}
+    private readonly recordService: RecordsService,
+  ) { }
 
   async create(
     userId: UUID,
@@ -64,6 +66,10 @@ export class DoctorsService {
       throw new NotFoundException('Doctor not found');
     }
     return this.appointmentService.findAllByDoctorId(userId);
+  }
+
+  findAllRecordsByDoctorId(doctorId: UUID) {
+    return this.recordService.findAllByDoctorId(doctorId);
   }
 
   async update(
