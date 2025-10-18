@@ -7,7 +7,6 @@ import { UUID } from 'crypto';
 import { UsersService } from 'src/users/users.service';
 import { AppointmentsService } from 'src/appointments/appointments.service';
 import { UserRole } from 'src/users/entities/user.entity';
-import { AppointmentResponseDto } from 'src/appointments/dto/appointment-response.dto';
 
 @Injectable()
 export class RecordsService {
@@ -81,6 +80,13 @@ export class RecordsService {
   async findAllByPatientId(patientId: UUID): Promise<Records[]> {
     return this.recordRepository.find({
       where: { patient: { id: patientId } },
+      relations: ['doctor', 'patient', 'appointment'],
+    });
+  }
+
+  async findAllByDoctorId(doctorId: UUID): Promise<Records[]> {
+    return this.recordRepository.find({
+      where: { doctor: { id: doctorId } },
       relations: ['doctor', 'patient', 'appointment'],
     });
   }

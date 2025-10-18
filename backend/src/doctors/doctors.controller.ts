@@ -23,7 +23,7 @@ import { RequestWithUser } from 'src/common/types/auth';
 @ApiBearerAuth('access-token')
 @Controller('doctors')
 export class DoctorsController {
-  constructor(private readonly doctorsService: DoctorsService) {}
+  constructor(private readonly doctorsService: DoctorsService) { }
 
   @Roles(UserRole.DOCTOR)
   @Post()
@@ -42,10 +42,17 @@ export class DoctorsController {
   }
 
   @Roles(UserRole.DOCTOR)
-  @Get('appointments')
+  @Get('me/appointments')
   findAllAppointments(@Req() req: RequestWithUser) {
     const doctorId = req.user.userId;
     return this.doctorsService.findAllAppointmentsByUserId(doctorId);
+  }
+
+  @Get('me/records')
+  @Roles(UserRole.DOCTOR)
+  findAllRecords(@Req() req: RequestWithUser) {
+    const doctorId = req.user.userId;
+    return this.doctorsService.findAllRecordsByDoctorId(doctorId);
   }
 
   @Roles(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT)
@@ -53,6 +60,8 @@ export class DoctorsController {
   findOne(@Param('id') id: UUID) {
     return this.doctorsService.findOne(id);
   }
+
+
 
   @Roles(UserRole.DOCTOR)
   @Patch(':id')
