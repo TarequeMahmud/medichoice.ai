@@ -10,6 +10,12 @@ enum UserRole {
   PATIENT = "patient",
 }
 
+interface AuthUser {
+  userId: string;
+  email: string;
+  role: UserRole;
+}
+
 interface AuthLinksProps {
   mode?: "login" | "register" | "reset";
 }

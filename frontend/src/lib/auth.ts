@@ -14,7 +14,7 @@ export async function verifyToken(): Promise<JwtPayload | null> {
 
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    return verified;
+    return verified as JwtPayload;
   } catch (error) {
     console.error("Token verification failed:", error);
     return null;

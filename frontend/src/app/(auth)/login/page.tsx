@@ -32,7 +32,7 @@ export default function Login() {
 
       if (response.status === 201) {
         const user = await authorizedUser();
-        window.location.href = `/${user.role}`;
+        window.location.href = `/dashboard`;
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

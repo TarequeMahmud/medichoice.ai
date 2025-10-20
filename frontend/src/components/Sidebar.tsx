@@ -33,7 +33,7 @@ const Sidebar: React.FC<SideBarProps> = ({ role }) => {
             key={idx}
             onClick={() => {
               setActiveIdx(idx);
-              handleNavigate(`/${role}/${img.page}`);
+              handleNavigate(`/dashboard/${img.page}`);
             }}
             className="mb-3 last:mb-0 focus:outline-none rounded transition"
             type="button"

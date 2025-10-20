@@ -1,6 +1,6 @@
 import { Appointment } from "@/types/appointment";
-import { useState, useEffect } from "react";
-import { authorizedUser } from "@/lib/axios";
+import { useEffect } from "react";
+
 import useLoader from "@/hooks/useLoader";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
@@ -8,8 +8,7 @@ import {
   selectAllAppointments,
 } from "@/lib/features/appointment/appointmentSlice";
 
-export default function useAppointmentsWithRole(url: string) {
-  const [role, setRole] = useState<UserRole | "">("");
+export default function useAppointments(url: string) {
   const { loading, showLoader, hideLoader } = useLoader();
   const appointments: Appointment[] = useAppSelector(selectAllAppointments);
   const dispatch = useAppDispatch();
@@ -18,13 +17,11 @@ export default function useAppointmentsWithRole(url: string) {
   useEffect(() => {
     const checkUser = async () => {
       showLoader();
-      const user = await authorizedUser();
-      setRole(user.role);
       await dispatch(fetchAppointments(url));
       hideLoader();
     };
     if (!fetched) checkUser();
   }, [url, dispatch, fetched]);
 
-  return { appointments, role, loading };
+  return { appointments, loading };
 }

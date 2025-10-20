@@ -19,7 +19,7 @@ export default async function Auth({
   console.log("token is:", token);
 
   if (token) {
-    redirect(`/${token.role}`);
+    redirect('/dashboard');
   }
   return (
     <div className="flex flex-col md:flex-row justify-center items-center w-full mx-auto min-h-screen p-4">
@@ -44,7 +44,7 @@ export default async function Auth({
         </p>
       </div>
 
-      <ClientLayout>{children}</ClientLayout>
+      {children}
     </div>
   );
 }

@@ -5,10 +5,11 @@ import RecordCard from "@/components/RecordCard";
 import LoadingOrEmpty from "@/components/LoadingOrEmpty";
 import Section from "@/components/Section";
 import useRecords from "@/hooks/useRecords";
-import { useParams } from "next/navigation";
+import { useUser } from "@/components/ClientLayout";
+
 
 const Page: React.FC = () => {
-    const { role } = useParams<{ role: string }>();
+    const role = useUser()?.role;
     const endpoint =
         role === "admin"
             ? "/records"

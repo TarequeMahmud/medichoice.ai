@@ -15,14 +15,14 @@ export const metadata: Metadata = {
 };
 
 const Layout: React.FC<LayoutProps> = async ({ children }) => {
-  const isValidUser = await verifyToken();
-  if (!isValidUser) {
+  const user = await verifyToken();
+  if (!user) {
     redirect("/login");
   }
   return (
-    <div className="flex flex-row justify-start items-center min-h-screen w-full p-4">
-      <Sidebar role={isValidUser.role} />
-      <ClientLayout>{children}</ClientLayout>
+    <div className="flex flex-row justify-center items-center min-h-screen w-full p-4">
+      <Sidebar role={user.role} />
+      <ClientLayout user={user}>{children}</ClientLayout>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 import { verifyToken } from "@/lib/auth";
 import { redirect } from "next/navigation";
 export default async function Page() {
-  const isValidUser = await verifyToken();
-  if (!isValidUser) {
+  const user = await verifyToken();
+  if (!user) {
     redirect("/login");
   } else {
-    redirect(`/${isValidUser.role}`);
+    redirect("/dashboard");
   }
 }
