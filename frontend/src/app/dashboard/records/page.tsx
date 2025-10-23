@@ -9,7 +9,8 @@ import { useUser } from "@/components/ClientLayout";
 
 
 const Page: React.FC = () => {
-    const role = useUser()?.role;
+    const { user } = useUser();
+    const role = user?.role;
     const endpoint =
         role === "admin"
             ? "/records"

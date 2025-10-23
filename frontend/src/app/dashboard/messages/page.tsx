@@ -7,22 +7,13 @@ import { Button } from "@/components/ui/button";
 import Section from "@/components/Section";
 import { io, Socket } from "socket.io-client";
 import { axiosInstance } from "@/lib/axios";
+import { useUser } from "@/components/ClientLayout";
 
 type ChatMessage = { name: string; message: string; local?: boolean };
-type UserSummary = { id: string; full_name: string; email: string };
 
-type MeResponse = {
-    user: {
-        userId: string;
-        email: string;
-        role: string;
-    } | null;
-    token: string | null;
-};
 
 const MessagesPage: React.FC = () => {
-    const [me, setMe] = useState<MeResponse["user"] | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+    const { user, token } = useUser()
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -37,27 +28,7 @@ const MessagesPage: React.FC = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }, [messages, selectedDoctor]);
 
-    // Fetch /api/me (user + token)
-    useEffect(() => {
-        let isMounted = true;
-        const fetchMe = async () => {
-            try {
-                const res = await fetch("/api/me");
-                if (!isMounted) return;
-                const data: MeResponse = await res.json();
-                setMe(data.user);
-                setToken(data.token);
-            } catch (err) {
-                console.error("Failed to fetch /api/me:", err);
-                setMe(null);
-                setToken(null);
-            }
-        };
-        fetchMe();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+
 
     // Fetch doctors for sidebar
     useEffect(() => {
@@ -121,9 +92,9 @@ const MessagesPage: React.FC = () => {
     };
 
     const sendMessage = () => {
-        if (!input.trim() || !socketRef.current || !selectedDoctor || !me) return;
+        if (!input.trim() || !socketRef.current || !selectedDoctor || !user) return;
         const payload = {
-            senderId: me.userId,
+            senderId: user.userId,
             receiverId: selectedDoctor.id,
             content: input.trim(),
         };
@@ -140,7 +111,7 @@ const MessagesPage: React.FC = () => {
 
     return (
         <Section title="Messages">
-            <div className="relative w-[70%] min-h-100 mx-auto flex gap-6 bg-[#05050580] rounded-[25px] p-6 shadow-lg backdrop-blur-md border border-white/10 text-white">
+            <div className="relative w-[70%] h-130 mx-auto flex gap-6 bg-[#05050580] rounded-[25px] p-6 shadow-lg backdrop-blur-md border border-white/10 text-white">
                 {/* Chat area */}
                 <Card className="flex-1 bg-[#D9D9D952] border-none rounded-[20px] shadow-lg flex flex-col justify-between overflow-hidden">
                     <CardHeader className="border-b border-white/20">
@@ -149,7 +120,7 @@ const MessagesPage: React.FC = () => {
                         </CardTitle>
                     </CardHeader>
 
-                    <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                    <CardContent className="flex-1 overflow-y-scroll p-4 space-y-4 custom-scrollbar">
                         {selectedDoctor ? (
                             <>
                                 {messages.length === 0 && (
@@ -208,7 +179,7 @@ const MessagesPage: React.FC = () => {
                 <div className="w-[40%] bg-[#D9D9D952] rounded-[20px] shadow-lg flex flex-col">
                     <h3 className="text-xl font-semibold text-white px-4 py-3 border-b border-white/20">Doctors</h3>
 
-                    <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
+                    <div className="flex-1 overflow-y-scroll p-2 custom-scrollbar">
                         {loadingDoctors && <p className="text-white/60 px-2">Loading doctors...</p>}
 
                         {!loadingDoctors && doctors.length === 0 && (

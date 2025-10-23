@@ -8,13 +8,13 @@ export async function getToken(): Promise<string | null> {
   return data?.value ?? null;
 }
 
-export async function verifyToken(): Promise<JwtPayload | null> {
+export async function verifyToken(): Promise<UserTokenResponse | null> {
   const token = await getToken();
   if (!token) return null;
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    return verified as JwtPayload;
+    const verified = jwt.verify(token, process.env.JWT_SECRET!) as AuthUser;
+    return { user: verified, token } as UserTokenResponse;
   } catch (error) {
     console.error("Token verification failed:", error);
     return null;

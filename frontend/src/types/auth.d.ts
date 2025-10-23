@@ -16,6 +16,11 @@ interface AuthUser {
   role: UserRole;
 }
 
+interface UserTokenResponse {
+  user: AuthUser;
+  token: string;
+}
+
 interface AuthLinksProps {
   mode?: "login" | "register" | "reset";
 }
