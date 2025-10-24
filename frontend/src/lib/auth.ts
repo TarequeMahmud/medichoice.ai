@@ -17,6 +17,7 @@ export async function verifyToken(): Promise<UserTokenResponse | null> {
     const user: AuthUser = {
       userId: (verified as JwtPayload).sub as string,
       email: (verified as JwtPayload).email as string,
+      full_name: (verified as JwtPayload).full_name as string,
       role: (verified as JwtPayload).role as UserRole,
     }
     return { user, token } as UserTokenResponse;

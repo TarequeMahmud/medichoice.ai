@@ -3,6 +3,7 @@ import { UUID } from 'crypto';
 export interface JwtPayload {
   sub: UUID;
   email: string;
+  full_name: string;
   role: UserRole;
 }
 
@@ -13,6 +14,7 @@ import { UserRole } from 'src/users/entities/user.entity';
 export interface RequestWithUser extends Request {
   user: {
     userId: UUID;
+    full_name: string;
     email: string;
   };
 }
