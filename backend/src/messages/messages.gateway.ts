@@ -28,35 +28,35 @@ export class MessagesGateway
   ) { }
 
   afterInit() {
-    this.logger.log('message socket initialised');
+    this.logger.log('Message socket initialised');
   }
 
   handleConnection(client: AuthenticatedSocket) {
     const token: string = client.handshake.auth.token as string;
-
     if (!token) {
       client.disconnect();
-      console.warn('Connection rejected: No token provided');
+      this.logger.warn('Connection rejected: No token provided');
+      return;
     }
 
     try {
       const payload: JwtPayload = this.jwtService.verify(token);
       if (![UserRole.DOCTOR, UserRole.PATIENT].includes(payload.role)) {
-        client.emit('auth error:', { message: 'Forbidden role' });
+        client.emit('auth_error', { message: 'Forbidden role' });
         client.disconnect(true);
         this.logger.warn(`Connection rejected: Invalid role ${payload.role}`);
         return;
       }
       client.data.user = payload;
-      console.log(payload);
-    } catch (error: unknown) {
+      this.logger.log(`Connected: ${payload.email}`);
+    } catch (error) {
       client.disconnect();
-      console.warn('Connection rejected: Invalid token:', error);
+      this.logger.warn('Connection rejected: Invalid token', error);
     }
   }
 
   handleDisconnect(client: AuthenticatedSocket) {
-    this.logger.log(`Client disconnected: ${client.data.user.email}`);
+    this.logger.log(`Client disconnected: ${client.data.user?.email}`);
   }
 
   @SubscribeMessage('joinRoom')
@@ -64,32 +64,27 @@ export class MessagesGateway
     @MessageBody() data: { receiverId: string },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    let room: string;
     const sender = client.data.user;
-    console.log('the reciever is: ', data.receiverId);
     const senderRole: UserRole = sender.role;
-
-    if (senderRole === UserRole.DOCTOR) {
-      room = `room-${sender.sub}-${data.receiverId}`;
-    } else {
-      room = `room-${data.receiverId}-${sender.sub}`;
-    }
+    const room =
+      senderRole === UserRole.DOCTOR
+        ? `room-${sender.sub}-${data.receiverId}`
+        : `room-${data.receiverId}-${sender.sub}`;
 
     await client.join(room);
     client.data.room = room;
-    this.logger.log('joined room: ', room);
-    const getPreviousMessage = await this.messagesService.findByRoom(room);
 
-    const messages = getPreviousMessage.map((message) => ({
-      senderId: message.sender.id,
-      name: message.sender.full_name,
-      message: message.message,
+    this.logger.log(`Joined room: ${room}`);
+
+    // Fetch previous messages
+    const previousMessages = await this.messagesService.findByRoom(room);
+    const messages = previousMessages.map((m) => ({
+      senderId: m.sender.id,
+      name: m.sender.full_name,
+      message: m.message,
     }));
-    console.log(messages);
 
-    for (const msg of messages) {
-      client.emit('receiveMessage', msg);
-    }
+    client.emit('receivePreviousMessages', messages);
   }
 
   @SubscribeMessage('sendMessage')
@@ -98,31 +93,34 @@ export class MessagesGateway
     @MessageBody() data: SendMessageDto,
   ): Promise<void> {
     const sender = client.data.user;
+    console.log('Sender info:', sender);
     const room = client.data.room;
 
-    if (!sender) {
-      this.logger.warn('Unauthorized message attempt — no sender info.');
+    if (!sender || !room) {
+      this.logger.warn('Unauthorized or invalid message context.');
       client.emit('auth_error', { message: 'Unauthorized' });
-      client.disconnect(true);
       return;
     }
 
-    const messageToSave = {
-      ...data,
+    const messagePayload = {
       senderId: sender.sub,
+      name: sender.full_name,
+      message: data.content,
     };
 
-    const messageData = await this.messagesService.create(messageToSave, room);
+    // ✅ Immediately broadcast (optimistic update)
+    this.server.to(room).emit('receiveMessage', messagePayload);
 
-    const message = {
-      senderId: messageData.sender.id,
-      name: messageData.sender.full_name,
-      message: messageData.message,
-    };
+    // 🗄 Save asynchronously (don’t block broadcast)
+    this.messagesService
+      .create({ ...data, senderId: sender.sub }, room)
+      .then(() => {
+        this.logger.log(`Message saved for ${sender.email} in ${room}`);
+      })
+      .catch((err) => {
+        this.logger.error('Failed to save message:', err);
+      });
 
-    this.server.to(room).emit('receiveMessage', message);
-
-    this.logger.log(`Message sent in ${room} by ${sender.email}`);
+    this.logger.log(`Message broadcasted in ${room} by ${sender.email}`);
   }
-
 }

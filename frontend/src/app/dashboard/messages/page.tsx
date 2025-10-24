@@ -9,28 +9,24 @@ import { io, Socket } from "socket.io-client";
 import { axiosInstance } from "@/lib/axios";
 import { useUser } from "@/components/ClientLayout";
 
-
-
+type ChatMessage = { senderId: string; name: string; message: string };
 
 const MessagesPage: React.FC = () => {
-    const { user, token } = useUser()
+    const { user, token } = useUser();
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
     const socketRef = useRef<Socket | null>(null);
-    const [connected, setConnected] = useState(false);
     const [loadingDoctors, setLoadingDoctors] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    // Scroll to bottom when messages change
+    // auto-scroll to bottom on new messages / room change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }, [messages, selectedDoctor]);
 
-
-
-    // Fetch doctors for sidebar
+    // fetch doctors
     useEffect(() => {
         const fetchDoctors = async () => {
             setLoadingDoctors(true);
@@ -46,18 +42,19 @@ const MessagesPage: React.FC = () => {
         fetchDoctors();
     }, []);
 
-    // Connect and join room
+    // create socket and attach handlers for a room
     const connectAndJoin = (receiverId: string) => {
         if (!token) {
             alert("No token found. Please login again.");
             return;
         }
 
+        // Disconnect & clean previous socket (if any)
         if (socketRef.current) {
+            socketRef.current.removeAllListeners();
             socketRef.current.disconnect();
             socketRef.current = null;
             setMessages([]);
-            setConnected(false);
         }
 
         const WS_URL =
@@ -72,27 +69,50 @@ const MessagesPage: React.FC = () => {
 
         socketRef.current = socket;
 
+        // IMPORTANT: set up handlers here
         socket.on("connect", () => {
-            setConnected(true);
             console.log("Socket connected:", socket.id);
+            // ask server to join the correct room
             socket.emit("joinRoom", { receiverId });
         });
 
-        socket.on("disconnect", () => setConnected(false));
-        socket.on("connect_error", (err) => console.error("Socket connect error:", err));
-        socket.on("receiveMessage", (payload) =>
-            setMessages((prev) => [...prev, { senderId: payload.senderId, receiverId: payload.receiverId, name: payload.name, message: payload.message }])
-        );
+        socket.on("disconnect", (reason) => {
+            console.log("Socket disconnected:", reason);
+        });
 
+        socket.on("connect_error", (err) => {
+            console.error("Socket connect error:", err);
+        });
+
+        // Server will send previous messages as a single array under this event
+        socket.on("receivePreviousMessages", (payload: Array<{ senderId: string; name: string; message: string }>) => {
+            // replace messages with previous history
+            if (Array.isArray(payload)) {
+                setMessages(payload.map((m) => ({ senderId: m.senderId, name: m.name, message: m.message })));
+            }
+        });
+
+        // Server will broadcast each new message as 'receiveMessage'
+        socket.on("receiveMessage", (payload: { senderId: string; name: string; message: string }) => {
+            if (!payload) return;
+            setMessages((prev) => {
+                // simple dedupe: avoid adding exact duplicate that already exists at the end
+                const last = prev[prev.length - 1];
+                if (last && last.senderId === payload.senderId && last.message === payload.message) {
+                    return prev;
+                }
+                return [...prev, { senderId: payload.senderId, name: payload.name, message: payload.message }];
+            });
+        });
     };
 
     const handleSelectDoctor = (doc: Doctor) => {
         setSelectedDoctor(doc);
-        setMessages([]);
+        setMessages([]); // clear while joining
         connectAndJoin(doc.id);
-        console.log(messages)
     };
 
+    // Option 1 chosen — rely on server broadcast to render message (no optimistic local push)
     const sendMessage = () => {
         if (!input.trim() || !socketRef.current || !selectedDoctor || !user) return;
         const payload = {
@@ -100,14 +120,18 @@ const MessagesPage: React.FC = () => {
             receiverId: selectedDoctor.id,
             content: input.trim(),
         };
-        setMessages((prev) => [...prev, { senderId: user.userId, receiverId: selectedDoctor.id, name: "You", message: payload.content }]);
         socketRef.current.emit("sendMessage", payload);
         setInput("");
     };
 
+    // cleanup on unmount
     useEffect(() => {
         return () => {
-            socketRef.current?.disconnect();
+            if (socketRef.current) {
+                socketRef.current.removeAllListeners();
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
         };
     }, []);
 
@@ -117,36 +141,20 @@ const MessagesPage: React.FC = () => {
                 {/* Chat area */}
                 <Card className="flex-1 bg-[#D9D9D952] border-none rounded-[20px] shadow-lg flex flex-col justify-between overflow-hidden">
                     <CardHeader className="border-b border-white/20">
-                        <CardTitle className="text-2xl text-white">
-                            {selectedDoctor ? selectedDoctor.name : "Select a doctor to start"}
-                        </CardTitle>
+                        <CardTitle className="text-2xl text-white">{selectedDoctor ? (selectedDoctor.name || "Chat") : "Select a doctor to start"}</CardTitle>
                     </CardHeader>
 
                     <CardContent className="flex-1 overflow-y-scroll p-4 space-y-4 custom-scrollbar">
                         {selectedDoctor ? (
                             <>
-                                {messages.length === 0 && (
-                                    <p className="text-sm text-white/60">No messages yet. Say hello 👋</p>
-                                )}
+                                {messages.length === 0 && <p className="text-sm text-white/60">No messages yet. Say hello 👋</p>}
 
                                 {messages.map((m, i) => {
                                     const isUser = m.senderId === user?.userId;
-
                                     return (
-                                        <div
-                                            key={i}
-                                            className={`flex w-full ${isUser ? "justify-end" : "justify-start"
-                                                }`}
-                                        >
-                                            <div
-                                                className={`max-w-[70%] p-3 rounded-2xl shadow-md ${isUser ? "bg-[#4A9EFF90] text-right" : "bg-[#ffffff20]"
-                                                    }`}
-                                            >
-                                                {!isUser && (
-                                                    <div className="text-xs text-white/80 mb-1 font-semibold">
-                                                        {m.name}
-                                                    </div>
-                                                )}
+                                        <div key={i} className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}>
+                                            <div className={`max-w-[70%] p-3 rounded-2xl shadow-md ${isUser ? "bg-[#4A9EFF90] text-right" : "bg-[#ffffff20]"}`}>
+                                                {!isUser && <div className="text-xs text-white/80 mb-1 font-semibold">{m.name}</div>}
                                                 <p className="text-sm">{m.message}</p>
                                             </div>
                                         </div>
@@ -161,8 +169,6 @@ const MessagesPage: React.FC = () => {
                             </div>
                         )}
                     </CardContent>
-
-
 
                     {/* Input */}
                     <div className="flex items-center gap-2 border-t border-white/20 p-3">
@@ -180,11 +186,7 @@ const MessagesPage: React.FC = () => {
                             }}
                             disabled={!selectedDoctor}
                         />
-                        <Button
-                            className="rounded-xl px-6 bg-[#4A9EFF] hover:bg-[#3C89E2]"
-                            onClick={sendMessage}
-                            disabled={!selectedDoctor}
-                        >
+                        <Button className="rounded-xl px-6 bg-[#4A9EFF] hover:bg-[#3C89E2]" onClick={sendMessage} disabled={!selectedDoctor}>
                             Send
                         </Button>
                     </div>
@@ -196,21 +198,16 @@ const MessagesPage: React.FC = () => {
 
                     <div className="flex-1 overflow-y-scroll p-2 custom-scrollbar">
                         {loadingDoctors && <p className="text-white/60 px-2">Loading doctors...</p>}
-
-                        {!loadingDoctors && doctors.length === 0 && (
-                            <p className="text-white/60 px-2">No doctors available.</p>
-                        )}
-
+                        {!loadingDoctors && doctors.length === 0 && <p className="text-white/60 px-2">No doctors available.</p>}
                         {!loadingDoctors &&
                             doctors.map((doc) => (
                                 <div
                                     key={doc.id}
                                     onClick={() => handleSelectDoctor(doc)}
-                                    className={`rounded-xl p-3 mb-3 cursor-pointer transition
-                    ${selectedDoctor?.id === doc.id ? "bg-[#4A9EFF40]" : "bg-[#ffffff15] hover:bg-[#ffffff25]"}`}
+                                    className={`rounded-xl p-3 mb-3 cursor-pointer transition ${selectedDoctor?.id === doc.id ? "bg-[#4A9EFF40]" : "bg-[#ffffff15] hover:bg-[#ffffff25]"}`}
                                 >
                                     <p className="font-semibold">{doc.name}</p>
-                                    <p className="text-sm text-gray-300">{doc.specializations.join(", ")}</p>
+                                    <p className="text-sm text-gray-300">{(doc as any).specializations?.join?.(", ") || ""}</p>
                                 </div>
                             ))}
                     </div>
