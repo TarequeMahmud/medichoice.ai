@@ -9,7 +9,7 @@ import { io, Socket } from "socket.io-client";
 import { axiosInstance } from "@/lib/axios";
 import { useUser } from "@/components/ClientLayout";
 
-type ChatMessage = { name: string; message: string; local?: boolean };
+
 
 
 const MessagesPage: React.FC = () => {
@@ -81,14 +81,16 @@ const MessagesPage: React.FC = () => {
         socket.on("disconnect", () => setConnected(false));
         socket.on("connect_error", (err) => console.error("Socket connect error:", err));
         socket.on("receiveMessage", (payload) =>
-            setMessages((prev) => [...prev, { name: payload.name, message: payload.message }])
+            setMessages((prev) => [...prev, { senderId: payload.senderId, receiverId: payload.receiverId, name: payload.name, message: payload.message }])
         );
+
     };
 
     const handleSelectDoctor = (doc: Doctor) => {
         setSelectedDoctor(doc);
         setMessages([]);
         connectAndJoin(doc.id);
+        console.log(messages)
     };
 
     const sendMessage = () => {
@@ -98,7 +100,7 @@ const MessagesPage: React.FC = () => {
             receiverId: selectedDoctor.id,
             content: input.trim(),
         };
-        setMessages((prev) => [...prev, { name: "You", message: payload.content, local: true }]);
+        setMessages((prev) => [...prev, { senderId: user.userId, receiverId: selectedDoctor.id, name: "You", message: payload.content }]);
         socketRef.current.emit("sendMessage", payload);
         setInput("");
     };
@@ -128,18 +130,29 @@ const MessagesPage: React.FC = () => {
                                 )}
 
                                 {messages.map((m, i) => {
-                                    const isLocal = m.local || m.name === "You";
+                                    const isUser = m.senderId === user?.userId;
+
                                     return (
                                         <div
                                             key={i}
-                                            className={`max-w-[70%] p-3 rounded-2xl shadow-md ${isLocal ? "self-end bg-[#4a9eff90]" : "self-start bg-[#ffffff20]"
+                                            className={`flex w-full ${isUser ? "justify-end" : "justify-start"
                                                 }`}
                                         >
-                                            {!isLocal && <div className="text-xs text-white/80 mb-1 font-semibold">{m.name}</div>}
-                                            <p className="text-sm">{m.message}</p>
+                                            <div
+                                                className={`max-w-[70%] p-3 rounded-2xl shadow-md ${isUser ? "bg-[#4A9EFF90] text-right" : "bg-[#ffffff20]"
+                                                    }`}
+                                            >
+                                                {!isUser && (
+                                                    <div className="text-xs text-white/80 mb-1 font-semibold">
+                                                        {m.name}
+                                                    </div>
+                                                )}
+                                                <p className="text-sm">{m.message}</p>
+                                            </div>
                                         </div>
                                     );
                                 })}
+
                                 <div ref={messagesEndRef} />
                             </>
                         ) : (
@@ -148,6 +161,8 @@ const MessagesPage: React.FC = () => {
                             </div>
                         )}
                     </CardContent>
+
+
 
                     {/* Input */}
                     <div className="flex items-center gap-2 border-t border-white/20 p-3">
