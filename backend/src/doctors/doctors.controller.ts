@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { DoctorsService } from './doctors.service';
 import { MessagesService } from 'src/messages/messages.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
@@ -18,11 +27,14 @@ export class DoctorsController {
   constructor(
     private readonly doctorsService: DoctorsService,
     private readonly messagesService: MessagesService,
-  ) { }
+  ) {}
 
   @Roles(UserRole.DOCTOR)
   @Post()
-  create(@Body() createDoctorDto: CreateDoctorDto, @Req() req: RequestWithUser) {
+  create(
+    @Body() createDoctorDto: CreateDoctorDto,
+    @Req() req: RequestWithUser,
+  ) {
     const userId = req.user.userId;
     return this.doctorsService.create(userId, createDoctorDto);
   }

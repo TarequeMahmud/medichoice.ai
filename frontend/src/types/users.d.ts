@@ -34,3 +34,13 @@ interface Patient {
 
 
 type ChatMessage = { senderId: string; receiverId: string; name: string; message: string; };
+
+
+interface DoctorChat {
+  room: string;
+  lastMessageAt: Date;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  receiverName: string;
+}

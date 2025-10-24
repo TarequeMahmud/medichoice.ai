@@ -29,3 +29,12 @@ export interface AuthenticatedSocket extends Socket {
     room: string;
   };
 }
+
+export interface DoctorChat {
+  room: string;
+  lastMessageAt: Date;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  receiverName: string;
+}

@@ -9,9 +9,15 @@ import { RecordsModule } from 'src/records/records.module';
 import { MessagesModule } from 'src/messages/messages.module';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, AppointmentsModule, RecordsModule, MessagesModule],
+  imports: [
+    DatabaseModule,
+    UsersModule,
+    AppointmentsModule,
+    RecordsModule,
+    MessagesModule,
+  ],
   controllers: [DoctorsController],
   providers: [...doctorProviders, DoctorsService],
   exports: [DoctorsService],
 })
-export class DoctorsModule { }
+export class DoctorsModule {}

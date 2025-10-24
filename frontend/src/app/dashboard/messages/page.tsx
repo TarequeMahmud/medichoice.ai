@@ -36,13 +36,13 @@ const MessagesPage: React.FC = () => {
                 if (user?.role === "doctor") {
                     // Doctor: fetch only chat rooms with patients
                     const res = await axiosInstance.get("/doctors/me/chats");
-                    const data = res.data as any[];
+                    const data = res.data as DoctorChat[];
 
                     // Extract unique patients from chats
                     const patientsMap = new Map<string, Patient>();
                     data.forEach((chat) => {
-                        const otherId = chat.senderid === user.userId ? chat.receiverid : chat.senderid;
-                        const otherName = chat.senderid === user.userId ? chat.receivername : chat.sendername;
+                        const otherId = chat.senderId === user.userId ? chat.receiverId : chat.senderId;
+                        const otherName = chat.senderId === user.userId ? chat.receiverName : chat.senderName;
                         const room = chat.room;
 
                         if (!patientsMap.has(otherId)) {

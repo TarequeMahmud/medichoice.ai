@@ -18,14 +18,15 @@ import { AuthenticatedSocket, JwtPayload } from 'src/common/types/auth';
 
 @WebSocketGateway()
 export class MessagesGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('MessageGateway');
 
   constructor(
     private readonly messagesService: MessagesService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   afterInit() {
     this.logger.log('Message socket initialised');
@@ -88,10 +89,10 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('sendMessage')
-  async handleMessage(
+  handleMessage(
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() data: SendMessageDto,
-  ): Promise<void> {
+  ): void {
     const sender = client.data.user;
     console.log('Sender info:', sender);
     const room = client.data.room;
