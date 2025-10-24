@@ -18,15 +18,14 @@ import { AuthenticatedSocket, JwtPayload } from 'src/common/types/auth';
 
 @WebSocketGateway()
 export class MessagesGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('MessageGateway');
 
   constructor(
     private readonly messagesService: MessagesService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   afterInit() {
     this.logger.log('message socket initialised');
@@ -82,9 +81,11 @@ export class MessagesGateway
     const getPreviousMessage = await this.messagesService.findByRoom(room);
 
     const messages = getPreviousMessage.map((message) => ({
+      senderId: message.sender.id,
       name: message.sender.full_name,
       message: message.message,
     }));
+    console.log(messages);
 
     for (const msg of messages) {
       client.emit('receiveMessage', msg);
@@ -94,19 +95,34 @@ export class MessagesGateway
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody()
-    data: SendMessageDto,
+    @MessageBody() data: SendMessageDto,
   ): Promise<void> {
+    const sender = client.data.user;
     const room = client.data.room;
-    console.log('room is:', room);
-    const messageData = await this.messagesService.create(data, room);
+
+    if (!sender) {
+      this.logger.warn('Unauthorized message attempt — no sender info.');
+      client.emit('auth_error', { message: 'Unauthorized' });
+      client.disconnect(true);
+      return;
+    }
+
+    const messageToSave = {
+      ...data,
+      senderId: sender.sub,
+    };
+
+    const messageData = await this.messagesService.create(messageToSave, room);
 
     const message = {
+      senderId: messageData.sender.id,
       name: messageData.sender.full_name,
       message: messageData.message,
     };
-    console.log(message);
+
     this.server.to(room).emit('receiveMessage', message);
-    this.logger.log(data);
+
+    this.logger.log(`Message sent in ${room} by ${sender.email}`);
   }
+
 }

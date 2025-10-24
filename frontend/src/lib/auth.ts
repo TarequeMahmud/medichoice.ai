@@ -13,8 +13,13 @@ export async function verifyToken(): Promise<UserTokenResponse | null> {
   if (!token) return null;
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET!) as AuthUser;
-    return { user: verified, token } as UserTokenResponse;
+    const verified = jwt.verify(token, process.env.JWT_SECRET!)
+    const user: AuthUser = {
+      userId: (verified as JwtPayload).sub as string,
+      email: (verified as JwtPayload).email as string,
+      role: (verified as JwtPayload).role as UserRole,
+    }
+    return { user, token } as UserTokenResponse;
   } catch (error) {
     console.error("Token verification failed:", error);
     return null;
