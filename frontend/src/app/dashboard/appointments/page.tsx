@@ -11,7 +11,7 @@ import { useUser } from "@/components/ClientLayout";
 
 
 const Page: React.FC = () => {
-  const user = useUser()
+  const { user } = useUser()
   const [showModal, setShowModal] = useState(false);
 
   // Determine the API endpoint based on the role

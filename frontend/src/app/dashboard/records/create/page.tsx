@@ -26,7 +26,7 @@ const CreateRecordPage: React.FC = () => {
     const [description, setDescription] = useState("");
     const [prescriptions, setPrescriptions] = useState<string[]>([""]);
     const [attachments, setAttachments] = useState<string[]>([""]);
-    const user = useUser()
+    const { user } = useUser()
 
     const handleAddPrescription = () => setPrescriptions([...prescriptions, ""]);
     const handleRemovePrescription = (index: number) =>

@@ -20,7 +20,7 @@ interface Patient {
   emergency_contact_name: string;
   emergency_contact_relation: string;
   address: string;
-  date_of_birth: string; // ISO format, e.g. '1990-01-01'
+  date_of_birth: string;
   gender: "male" | "female" | "other";
   height_cm: number;
   weight_kg: number;
@@ -30,4 +30,17 @@ interface Patient {
   medical_history: string;
   insurance_provider: string;
   insurance_number: string;
+}
+
+
+type ChatMessage = { senderId: string; receiverId: string; name: string; message: string; };
+
+
+interface DoctorChat {
+  room: string;
+  lastMessageAt: Date;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  receiverName: string;
 }

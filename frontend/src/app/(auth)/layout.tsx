@@ -15,10 +15,10 @@ export default async function Auth({
 }: {
   children: React.ReactNode;
 }) {
-  const token = await verifyToken();
-  console.log("token is:", token);
+  const response = await verifyToken();
+  console.log("token is:", response);
 
-  if (token) {
+  if (response) {
     redirect('/dashboard');
   }
   return (

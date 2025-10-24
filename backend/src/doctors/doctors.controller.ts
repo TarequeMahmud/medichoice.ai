@@ -9,12 +9,13 @@ import {
   Req,
 } from '@nestjs/common';
 import { DoctorsService } from './doctors.service';
+import { MessagesService } from 'src/messages/messages.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { UUID } from 'crypto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
 import { RequestWithUser } from 'src/common/types/auth';
@@ -23,7 +24,10 @@ import { RequestWithUser } from 'src/common/types/auth';
 @ApiBearerAuth('access-token')
 @Controller('doctors')
 export class DoctorsController {
-  constructor(private readonly doctorsService: DoctorsService) {}
+  constructor(
+    private readonly doctorsService: DoctorsService,
+    private readonly messagesService: MessagesService,
+  ) {}
 
   @Roles(UserRole.DOCTOR)
   @Post()
@@ -48,11 +52,19 @@ export class DoctorsController {
     return this.doctorsService.findAllAppointmentsByUserId(doctorId);
   }
 
-  @Get('me/records')
   @Roles(UserRole.DOCTOR)
+  @Get('me/records')
   findAllRecords(@Req() req: RequestWithUser) {
     const doctorId = req.user.userId;
     return this.doctorsService.findAllRecordsByDoctorId(doctorId);
+  }
+
+  @Roles(UserRole.DOCTOR)
+  @Get('me/chats')
+  @ApiOperation({ summary: 'Get all chat rooms for the logged-in doctor' })
+  async getMyChats(@Req() req: RequestWithUser) {
+    const doctorId = req.user.userId;
+    return this.messagesService.findAllChatsByDoctor(doctorId);
   }
 
   @Roles(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT)
