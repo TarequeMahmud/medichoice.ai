@@ -24,7 +24,7 @@ import { UserRole } from 'src/users/entities/user.entity';
 @ApiBearerAuth('access-token')
 @Controller('tips')
 export class TipsController {
-  constructor(private readonly tipsService: TipsService) {}
+  constructor(private readonly tipsService: TipsService) { }
 
   @Roles(UserRole.ADMIN)
   @Post()
@@ -39,16 +39,16 @@ export class TipsController {
     return this.tipsService.findAll();
   }
 
+  @Roles(UserRole.PATIENT, UserRole.ADMIN, UserRole.DOCTOR)
+  @Get('random')
+  getRandomTip() {
+    return this.tipsService.getRandom();
+  }
+
   @Roles(UserRole.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: UUID) {
     return this.tipsService.findOne(id);
-  }
-
-  @Roles(UserRole.PATIENT)
-  @Get('random')
-  getRandomTip() {
-    return this.tipsService.getRandom();
   }
 
   @Roles(UserRole.ADMIN)
