@@ -1,17 +1,11 @@
 'use client';
-import { useUser } from "@/components/ClientLayout";
+
+import { redirect } from "next/navigation";
 import React from "react";
 
 
 const Page: React.FC = () => {
-  const { user } = useUser();
-  const role = user?.role;
-  return (
-    <div className="w-[100%] mx-auto">
-      <h1>{role?.charAt(0).toUpperCase() + role?.slice(1)} Dashboard</h1>
-      <p>Welcome to the {role} dashboard page.</p>
-    </div>
-  );
+  redirect("/dashboard/appointments");
 };
 
 export default Page;
